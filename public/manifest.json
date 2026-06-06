@@ -1,0 +1,16 @@
+{
+  "name": "Thinkior AI",
+  "short_name": "Thinkior",
+  "description": "India's AI co-founder for early-stage startup founders",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#09090B",
+  "theme_color": "#F59E0B",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "any",
+      "type": "image/x-icon"
+    }
+  ]
+}
