@@ -146,7 +146,7 @@ export default function PricingSection() {
         <div className="flex items-center justify-center gap-3 mt-10">
           <div className="w-1.5 h-1.5 rounded-full bg-accent" />
           <p className="text-sm text-fg-muted">
-            All payments via Razorpay · Cancel any time · 7-day refund
+            All payments via Razorpay · Cancel any time · All sales final
           </p>
         </div>
       </div>

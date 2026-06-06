@@ -7,7 +7,7 @@ export default function Footer() {
         {/* Top grid */}
         <div className="grid lg:grid-cols-12 gap-10 pb-10 mb-10 border-b border-line">
           {/* Brand col */}
-          <div className="lg:col-span-5">
+          <div className="lg:col-span-4">
             <Link href="/" className="flex items-baseline gap-2 mb-5">
               <span className="wordmark text-fg text-2xl">Thinkior</span>
               <span className="wordmark-ai text-[22px]">Ai</span>
@@ -44,8 +44,19 @@ export default function Footer() {
             </ul>
           </div>
 
+          {/* Legal col */}
+          <div className="lg:col-span-2">
+            <p className="eyebrow mb-4">Legal</p>
+            <ul className="space-y-2.5">
+              <li><Link href="/privacy" className="text-sm text-fg-dim hover:text-fg transition-colors">Privacy Policy</Link></li>
+              <li><Link href="/terms" className="text-sm text-fg-dim hover:text-fg transition-colors">Terms &amp; Conditions</Link></li>
+              <li><Link href="/refund" className="text-sm text-fg-dim hover:text-fg transition-colors">Refund Policy</Link></li>
+              <li><Link href="/contact" className="text-sm text-fg-dim hover:text-fg transition-colors">Contact Us</Link></li>
+            </ul>
+          </div>
+
           {/* Connect col */}
-          <div className="lg:col-span-3">
+          <div className="lg:col-span-2">
             <p className="eyebrow mb-4">Connect</p>
             <ul className="space-y-2.5">
               <li>
@@ -83,12 +94,10 @@ export default function Footer() {
             © {new Date().getFullYear()} Thinkior AI. Built in India, for India&apos;s founders.
           </p>
           <div className="flex items-center gap-6">
-            <Link href="/privacy" className="text-xs text-fg-muted hover:text-fg-dim transition-colors">
-              Privacy
-            </Link>
-            <Link href="/terms" className="text-xs text-fg-muted hover:text-fg-dim transition-colors">
-              Terms
-            </Link>
+            <Link href="/privacy" className="text-xs text-fg-muted hover:text-fg-dim transition-colors">Privacy</Link>
+            <Link href="/terms" className="text-xs text-fg-muted hover:text-fg-dim transition-colors">Terms</Link>
+            <Link href="/refund" className="text-xs text-fg-muted hover:text-fg-dim transition-colors">Refund</Link>
+            <Link href="/contact" className="text-xs text-fg-muted hover:text-fg-dim transition-colors">Contact</Link>
             <span className="text-xs text-fg-muted font-mono">v 3.0</span>
           </div>
         </div>
