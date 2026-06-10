@@ -1,10 +1,14 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 
 // ── Daily hard caps per plan ─────────────────────────────────────────────────
+// Sum of all per-feature limits to act as an overall guard:
+// free: 1+1+1+1+5 (report excluded from sum) = 9
+// builder: 5+5+5+5+10 = 30
+// founder_pro: 10+10+10+10+15 = 55
 export const GLOBAL_DAILY_CAPS: Record<string, number> = {
-  free: 17,
-  builder: 65,
-  founder_pro: 220,
+  free: 9,
+  builder: 30,
+  founder_pro: 55,
 }
 
 const MAX_CONCURRENT = 2

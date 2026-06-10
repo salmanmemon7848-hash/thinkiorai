@@ -2,28 +2,28 @@ import type { PlanLimits, Plan } from '@/types'
 
 export const PLAN_LIMITS: Record<Plan, PlanLimits> = {
   free: {
-    validator: 2,
-    competitor: 1,
-    ideas: 3,
-    pitch: 1,
-    chat: 10,
+    validator: 1,    // 1 Business Validation / one time
+    competitor: 1,   // 1 Competitor Research / one time
+    ideas: 1,        // 1 Ideas session / one time
+    pitch: 1,        // 1 Pitch Evaluation / one time
+    chat: 5,         // 5 AI Chat messages / one time
     report: 1,
   },
   builder: {
-    validator: 10,
-    competitor: 5,
-    ideas: 15,
-    pitch: 5,
-    chat: 30,
+    validator: 5,    // 5 Business Validations / day
+    competitor: 5,   // 5 Competitor Research / day
+    ideas: 5,        // 5 Ideas sessions / day
+    pitch: 5,        // 5 Pitch Evaluations / day
+    chat: 10,        // 10 AI Chat messages / day
     report: 5,
   },
   founder_pro: {
-    validator: 30,
-    competitor: 20,
-    ideas: 50,
-    pitch: 20,
-    chat: 100,
-    report: 20,
+    validator: 10,   // 10 Business Validations / day
+    competitor: 10,  // 10 Competitor Research / day
+    ideas: 10,       // 10 Ideas sessions / day
+    pitch: 10,       // 10 Pitch Evaluations / day
+    chat: 15,        // 15 AI Chat messages / day
+    report: 10,
   },
 }
 

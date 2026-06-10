@@ -225,7 +225,7 @@ function CertificateCard({ data, certId }: { data: CertificateData; certId: stri
               fontWeight: 500,
             }}
           >
-            India's AI Co-Founder · Est. 2026
+            India&apos;s AI Co-Founder · Est. 2026
           </div>
         </div>
 
@@ -306,7 +306,7 @@ function CertificateCard({ data, certId }: { data: CertificateData; certId: stri
             alignSelf: 'center',
           }}
         >
-          has successfully validated their venture through Thinkior AI's rigorous
+          has successfully validated their venture through Thinkior AI&apos;s rigorous
           market-fit framework — earning a definitive&nbsp;
           <span style={{ fontWeight: 700, color: BRAND.emeraldDeep }}>GO Verdict</span>
           &nbsp;with&nbsp;
