@@ -65,7 +65,9 @@ export function ConsentBanner({ onComplete }: ConsentBannerProps) {
     if (user) {
       await supabase.from('user_consents').upsert({
         user_id: user.id,
-        ...consent,
+        functional: consent.functional,
+        analytics: consent.analytics,
+        marketing: consent.marketing,
         consent_version: CONSENT_VERSION,
         consented_at: consent.timestamp,
       })

@@ -15,14 +15,16 @@ declare global {
 const PLANS = [
   {
     id: 'free' as Plan,
-    features: ['2 validations / day', '1 competitor research / day', '10 chat messages / day'],
+    features: ['1 Business Validation / one time', '1 Competitor Research / one time', '1 Ideas session / one time', '1 Pitch Evaluation / one time', '5 AI Chat messages / one time'],
   },
   {
     id: 'builder' as Plan,
     features: [
-      '10 validations / day',
-      '5 competitor research / day',
-      '30 chat messages / day',
+      '5 Business Validations / day',
+      '5 Competitor Research / day',
+      '5 Ideas sessions / day',
+      '5 Pitch Evaluations / day',
+      '10 AI Chat messages / day',
       'All Indian languages',
       'Saved reports — unlimited',
     ],
@@ -30,9 +32,11 @@ const PLANS = [
   {
     id: 'founder_pro' as Plan,
     features: [
-      '30 validations / day',
-      '20 competitor research / day',
-      '100 chat messages / day',
+      '10 Business Validations / day',
+      '10 Competitor Research / day',
+      '10 Ideas sessions / day',
+      '10 Pitch Evaluations / day',
+      '15 AI Chat messages / day',
       'Priority AI',
       'Export reports as PDF',
       'Early access',
@@ -210,7 +214,7 @@ export default function PricingPage() {
       )}
 
       <p className="text-xs text-fg-muted text-center">
-        All payments via Razorpay · Cancel any time · 7-day refund guarantee
+        All payments via Razorpay
       </p>
     </div>
   )
