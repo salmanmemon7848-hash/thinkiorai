@@ -157,10 +157,20 @@ export async function POST(req: NextRequest) {
     }
 
     const raw = completion.choices[0]?.message?.content ?? ''
+    // If the AI response is not valid JSON (e.g., plain error text), return a clear error.
+    const isJson = raw.trim().startsWith('{') || raw.trim().startsWith('[')
+    if (!isJson) {
+      console.error('[reports/generate] Unexpected non‑JSON response from Groq:', raw)
+      return NextResponse.json(
+        { error: 'AI provider returned an invalid response. Please try again later.' },
+        { status: 502 }
+      )
+    }
     let report: Record<string, unknown>
     try {
       report = JSON.parse(raw)
     } catch {
+      // Attempt to clean Markdown code fences if present
       const stripped = raw.replace(/```json|```/g, '').trim()
       report = JSON.parse(stripped)
     }
