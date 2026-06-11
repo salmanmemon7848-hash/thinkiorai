@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Inter, JetBrains_Mono, Instrument_Serif } from 'next/font/google'
 import './globals.css'
+import { GoogleAnalytics } from '@next/third-parties/google'
 import { AuthProvider } from '@/contexts/AuthContext'
 
 // Inter as Geist substitute (Geist is not yet stable in all next/font versions —
@@ -55,6 +56,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       className={`${geist.variable} ${geistMono.variable} ${instrument.variable}`}
     >
       <body className="bg-bg text-fg antialiased">
+        <GoogleAnalytics gaId="G-QWQW588B0K" />
         <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
