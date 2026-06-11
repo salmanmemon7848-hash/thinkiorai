@@ -41,6 +41,7 @@ export default function Footer() {
               <li><Link href="/login" className="text-sm text-fg-dim hover:text-fg transition-colors">Sign in</Link></li>
               <li><Link href="/signup" className="text-sm text-fg-dim hover:text-fg transition-colors">Get started</Link></li>
               <li><Link href="/dashboard" className="text-sm text-fg-dim hover:text-fg transition-colors">Dashboard</Link></li>
+              <li><Link href="/about" className="text-sm text-fg-dim hover:text-fg transition-colors">About the founder</Link></li>
             </ul>
           </div>
 

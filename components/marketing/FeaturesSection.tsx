@@ -265,7 +265,7 @@ function FeatureCardChat() {
         <span className="eyebrow">Co-founder Desk</span>
       </div>
       <h3 className="font-display font-bold text-2xl text-fg tracking-tight leading-[1.1] mb-4">
-        Available at 11pm. And 3am.
+        Available 24/7.
       </h3>
       <p className="text-[14px] text-fg-dim leading-relaxed mb-7">
         Strategy. Fundraising. Operations. GTM. With deep Indian context —
