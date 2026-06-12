@@ -12,7 +12,7 @@ export default function RefundPage() {
       eyebrow="Legal"
       title="Refund & Cancellation Policy"
       subtitle="Please read this policy carefully before purchasing a paid plan."
-      lastUpdated="June 2025"
+      lastUpdated="June 2026"
     >
       <Section title="1. No Refund Policy">
         <p>
@@ -67,16 +67,31 @@ export default function RefundPage() {
 
       <Section title="5. Billing Errors">
         <p>
-          If you believe you were charged incorrectly (e.g., a duplicate charge or a charge for a plan you did not subscribe to), please contact us immediately at <strong>hello@thinkior.com</strong> with your payment reference number.
+          If you believe you were charged incorrectly (e.g., a duplicate charge or a charge for a plan you did not subscribe to), please contact us within <strong>7 days</strong> at <strong>hello@thinkior.com</strong> with your payment reference number.
         </p>
         <p>
           We will investigate and, if a billing error on our part is confirmed, take corrective action. This is the only scenario in which a payment adjustment may be considered and is at our sole discretion.
+        </p>
+        <p>
+          Nothing in this policy limits your statutory rights under the Consumer Protection
+          Act, 2019 or any other applicable law.
         </p>
       </Section>
 
       <Section title="6. Failed or Disputed Payments">
         <p>
-          If your payment fails, your subscription will not be activated or renewed. If you initiate a chargeback or payment dispute with your bank or card provider without contacting us first, we reserve the right to permanently suspend your account.
+          If your payment fails, your subscription will not be activated or renewed.
+        </p>
+        <p>
+          If you believe a charge is incorrect, we kindly ask that you contact us at{' '}
+          <strong>hello@thinkior.com</strong> first and allow us a reasonable opportunity
+          to investigate and resolve the issue. If you initiate a chargeback or payment
+          dispute with your bank or card provider <strong>without contacting us first</strong>,
+          we reserve the right to suspend your account pending the outcome of the dispute.
+        </p>
+        <p>
+          For genuine cases of non-delivery of the paid service, we will cooperate with
+          Razorpay and your bank in good faith to resolve the chargeback.
         </p>
       </Section>
 

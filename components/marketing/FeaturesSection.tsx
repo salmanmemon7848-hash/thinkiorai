@@ -8,6 +8,7 @@ import {
   TrendingUp,
   TrendingDown,
   AlertCircle,
+  FileText,
 } from 'lucide-react'
 import Link from 'next/link'
 
@@ -25,7 +26,7 @@ export default function FeaturesSection() {
         <div className="max-w-3xl mb-14 md:mb-20">
           <p className="eyebrow mb-4">The product</p>
           <h2 className="font-display font-bold text-4xl md:text-5xl lg:text-6xl text-fg tracking-tighter leading-[1.02]">
-            Five tools.{' '}
+            Six tools.{' '}
             <span className="font-serif-italic font-normal text-accent">
               One AI co-founder.
             </span>
@@ -38,19 +39,16 @@ export default function FeaturesSection() {
 
         {/* Bento grid */}
         <div className="grid md:grid-cols-12 gap-4 md:gap-5">
-          {/* Large card — Validator */}
+          {/* Row 1: Validator (7) + Competitor (5) */}
           <FeatureCardLarge />
-
-          {/* Competitor — wide */}
           <FeatureCardCompetitor />
 
-          {/* Ideas */}
+          {/* Row 2: Reports (4) + Ideas (4) + Pitch (4) */}
+          <FeatureCardReports />
           <FeatureCardIdeas />
-
-          {/* Pitch */}
           <FeatureCardPitch />
 
-          {/* Chat — wide */}
+          {/* Row 3: Chat — full-width */}
           <FeatureCardChat />
         </div>
       </div>
@@ -251,39 +249,112 @@ function FeatureCardPitch() {
   )
 }
 
-/* === Chat — wide === */
+/* === Reports === */
+function FeatureCardReports() {
+  return (
+    <Link
+      href="/signup?plan=founder_pro"
+      className="md:col-span-4 group card-premium rounded-2xl p-7 md:p-8 hover:bg-bg-elevated transition-all duration-500 relative overflow-hidden"
+    >
+      <div className="flex items-center gap-3 mb-6">
+        <div className="w-9 h-9 rounded-lg bg-signal-insight/15 border border-signal-insight/30 flex items-center justify-center">
+          <FileText className="w-4 h-4 text-signal-insight" />
+        </div>
+        <span className="eyebrow">Business Reports</span>
+        <span className="ml-auto font-mono text-[9px] uppercase tracking-caps text-signal-insight border border-signal-insight/30 bg-signal-insight/5 rounded-full px-2 py-0.5">
+          Pro
+        </span>
+      </div>
+      <h3 className="font-display font-bold text-2xl text-fg tracking-tight leading-[1.1] mb-4">
+        Investor-grade reports in 60 seconds.
+      </h3>
+      <p className="text-[14px] text-fg-dim leading-relaxed mb-7">
+        Eight sections — exec summary, market sizing in ₹, competitive
+        landscape, GTM strategy, projections, risks, and a 90-day plan.
+        Exportable as PDF.
+      </p>
+
+      {/* Mini report preview — section checklist */}
+      <div className="bg-bg-sub border border-line rounded-lg p-4 mb-6">
+        <p className="font-mono text-[10px] uppercase tracking-caps text-fg-muted mb-3">
+          Report structure
+        </p>
+        <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 text-[11px] text-fg-dim">
+          {[
+            'Executive summary',
+            'Market sizing (TAM/SAM/SOM)',
+            'Competitive landscape',
+            'GTM strategy',
+            '5-year projections',
+            'Risk register',
+            '90-day action plan',
+            'Funding ask & use',
+          ].map((section) => (
+            <div key={section} className="flex items-center gap-1.5">
+              <CheckCircle2 className="w-3 h-3 text-signal-insight flex-shrink-0" />
+              <span className="truncate">{section}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="flex items-center gap-2 text-signal-insight font-medium text-sm group-hover:gap-3 transition-all">
+        Generate a report
+        <ArrowRight className="w-4 h-4" />
+      </div>
+    </Link>
+  )
+}
+
+/* === Chat — full width === */
 function FeatureCardChat() {
   return (
     <Link
       href="/signup"
-      className="md:col-span-4 group card-premium rounded-2xl p-7 md:p-8 hover:bg-bg-elevated transition-all duration-500 relative overflow-hidden"
+      className="md:col-span-12 group card-premium rounded-2xl p-7 md:p-10 hover:bg-bg-elevated transition-all duration-500 relative overflow-hidden"
     >
-      <div className="flex items-center gap-3 mb-6">
-        <div className="w-9 h-9 rounded-lg bg-fg/10 border border-line-strong flex items-center justify-center">
-          <MessageSquare className="w-4 h-4 text-fg" />
+      <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
+        {/* Left: copy */}
+        <div>
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-9 h-9 rounded-lg bg-fg/10 border border-line-strong flex items-center justify-center">
+              <MessageSquare className="w-4 h-4 text-fg" />
+            </div>
+            <span className="eyebrow">Co-founder Desk</span>
+          </div>
+          <h3 className="font-display font-bold text-3xl md:text-4xl text-fg tracking-tight leading-[1.05] mb-4 max-w-md">
+            Your co-founder. Available 24/7. <span className="font-serif-italic font-normal text-fg-dim">On tap.</span>
+          </h3>
+          <p className="text-[15px] text-fg-dim leading-relaxed mb-7 max-w-md">
+            Strategy. Fundraising. Operations. GTM. Deep Indian context —
+            no generic advice. Speaks Hindi, Hinglish, or English. Has read
+            your reports and remembers your last conversation.
+          </p>
+          <div className="flex items-center gap-2 text-fg font-medium text-sm group-hover:gap-3 transition-all">
+            Try Co-founder Desk
+            <ArrowRight className="w-4 h-4" />
+          </div>
         </div>
-        <span className="eyebrow">Co-founder Desk</span>
-      </div>
-      <h3 className="font-display font-bold text-2xl text-fg tracking-tight leading-[1.1] mb-4">
-        Available 24/7.
-      </h3>
-      <p className="text-[14px] text-fg-dim leading-relaxed mb-7">
-        Strategy. Fundraising. Operations. GTM. With deep Indian context —
-        and zero generic advice. In Hindi, Hinglish, or English.
-      </p>
 
-      <div className="space-y-2 mb-6">
-        <div className="bg-fg/10 rounded-lg rounded-tr-sm px-3 py-2 text-[12px] text-fg ml-auto max-w-[80%] text-right">
-          When should I raise?
+        {/* Right: chat preview */}
+        <div className="space-y-3">
+          <div className="bg-fg/10 rounded-2xl rounded-tr-md px-4 py-3 text-[13px] text-fg ml-auto max-w-[85%] text-right">
+            Should I raise now or wait?
+          </div>
+          <div className="bg-bg-sub border border-line rounded-2xl rounded-tl-md px-4 py-3 text-[13px] text-fg-dim max-w-[90%]">
+            <p className="leading-relaxed">
+              With ₹12L MRR and 18% MoM growth — bootstrap 6 more months.
+              Raise on traction, not story. You&apos;ll get 1.5–2x the valuation
+              at ₹30L MRR.
+            </p>
+            <p className="mt-2 text-[11px] text-fg-muted font-mono">
+              Cited: Your last 3 months of growth · YC SAFE benchmarks · India Seed Fund 2024 portfolio
+            </p>
+          </div>
+          <div className="bg-fg/10 rounded-2xl rounded-tr-md px-4 py-3 text-[13px] text-fg ml-auto max-w-[70%] text-right">
+            What about dilution?
+          </div>
         </div>
-        <div className="bg-bg-sub border border-line rounded-lg rounded-tl-sm px-3 py-2 text-[12px] text-fg-dim max-w-[85%]">
-          With ₹12L MRR — bootstrap 6 more months. Raise on traction, not story.
-        </div>
-      </div>
-
-      <div className="flex items-center gap-2 text-fg font-medium text-sm group-hover:gap-3 transition-all">
-        Try Co-founder Desk
-        <ArrowRight className="w-4 h-4" />
       </div>
     </Link>
   )

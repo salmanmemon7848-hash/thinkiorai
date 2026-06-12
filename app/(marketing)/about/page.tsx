@@ -11,13 +11,6 @@ export const metadata: Metadata = {
 
 /* ─── data ──────────────────────────────────────────────────────────────── */
 
-const STATS = [
-  { value: '1,800+', label: 'Founders on platform' },
-  { value: '47', label: 'Cities across India' },
-  { value: 'A few weeks', label: 'From idea to launch' },
-  { value: '16', label: 'Age when launched' },
-]
-
 const TOOLS = [
   'Business Validator',
   'Competitor Intel',
@@ -72,26 +65,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* ── 2. Stats row ──────────────────────────────────────────────────── */}
-      <section className="border-b border-line">
-        <div className="max-w-[800px] mx-auto px-5 sm:px-6 py-12">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-y-8 md:gap-y-0">
-            {STATS.map((s, i) => (
-              <div
-                key={s.label}
-                className={`px-4 ${i !== 0 ? 'md:border-l border-line' : ''}`}
-              >
-                <div className="font-display font-semibold text-[clamp(1.5rem,3.5vw,2.25rem)] text-fg tabular leading-none tracking-tighter mb-2">
-                  {s.value}
-                </div>
-                <div className="text-[13px] text-fg-muted leading-snug">{s.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── 3. The Story ──────────────────────────────────────────────────── */}
+      {/* ── 2. The Story ──────────────────────────────────────────────────── */}
       <section className="py-16 border-b border-line">
         <div className="max-w-[800px] mx-auto px-5 sm:px-6">
           <p className="eyebrow mb-5">The story</p>
@@ -137,7 +111,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* ── 4. What I built ───────────────────────────────────────────────── */}
+      {/* ── 3. What I built ───────────────────────────────────────────────── */}
       <section className="py-16 border-b border-line">
         <div className="max-w-[800px] mx-auto px-5 sm:px-6">
           <p className="eyebrow mb-6">What I built</p>
@@ -159,7 +133,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* ── 5. Passion & vision ───────────────────────────────────────────── */}
+      {/* ── 4. Passion & vision ───────────────────────────────────────────── */}
       <section className="py-16 border-b border-line">
         <div className="max-w-[800px] mx-auto px-5 sm:px-6">
           <p className="eyebrow mb-6">What drives me</p>
@@ -223,7 +197,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* ── 6. CTA ────────────────────────────────────────────────────────── */}
+      {/* ── 5. CTA ────────────────────────────────────────────────────────── */}
       <section className="py-20">
         <div className="max-w-[800px] mx-auto px-5 sm:px-6 text-center">
           <h2 className="font-display font-bold text-3xl md:text-4xl text-fg tracking-tighter leading-tight mb-3">

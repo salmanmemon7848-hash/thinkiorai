@@ -24,11 +24,11 @@ const PLANS: Array<{
     price: 0,
     description: 'For founders sketching the first idea',
     features: [
-      { text: '1 Business Validation / one time' },
+      { text: '1 Business Validation (total)' },
       { text: 'Competitor Research — Builder & above', locked: true },
-      { text: '1 Ideas session / one time' },
-      { text: '1 Pitch Evaluation / one time' },
-      { text: '5 AI Chat messages / one time' },
+      { text: '1 Ideas session (total)' },
+      { text: '1 Pitch Evaluation (total)' },
+      { text: '5 AI Chat messages (total)' },
       { text: 'Business Reports — Founder Pro only', locked: true },
       { text: 'English & Hindi support' },
     ],
@@ -93,8 +93,9 @@ export default function PricingSection() {
             </span>
           </h2>
           <p className="text-lg text-fg-dim mt-6 max-w-2xl leading-relaxed">
-            Start free. Upgrade when you need more queries. No annual lock-in.
-            Cancel any time, any plan.
+            Start free with lifetime taste-tier access. Upgrade when you need
+            daily usage or investor-grade reports. No annual lock-in. Cancel
+            any time, any plan.
           </p>
         </div>
 
@@ -174,7 +175,7 @@ export default function PricingSection() {
         <div className="flex items-center justify-center gap-3 mt-10">
           <div className="w-1.5 h-1.5 rounded-full bg-accent" />
           <p className="text-sm text-fg-muted">
-            All payments via Razorpay · Cancel any time · All sales final
+            Payments via Razorpay · Daily limits reset at midnight IST · Cancel any time
           </p>
         </div>
       </div>
