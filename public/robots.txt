@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+# Block private/authenticated routes from crawlers
+Disallow: /dashboard
+Disallow: /api/
+Disallow: /onboarding
+
+# Sitemap
+Sitemap: https://thinkiorai.com/sitemap.xml

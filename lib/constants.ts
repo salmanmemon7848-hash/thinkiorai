@@ -60,5 +60,5 @@ export const FEATURE_NAMES: Record<string, string> = {
 
 export const APP_NAME = 'Thinkior AI'
 export const APP_TAGLINE = 'Your idea deserves the truth.'
-export const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://thinkior.com'
+export const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://thinkiorai.com'
 export const CONTACT_EMAIL = 'hello@thinkior.com'

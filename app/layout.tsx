@@ -29,6 +29,7 @@ const instrument = Instrument_Serif({
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://thinkiorai.com'),
   title: 'Thinkior AI — Intelligence for Indian Founders',
   description:
     "The AI co-founder for early-stage Indian founders. Brutal verdicts, real competitor intelligence, unit economics in ₹ — built for the way India actually builds startups.",
@@ -37,7 +38,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Thinkior AI — Intelligence for Indian Founders',
     description: 'The AI co-founder for early-stage Indian founders.',
-    url: 'https://thinkior.com',
+    url: 'https://thinkiorai.com',
     siteName: 'Thinkior AI',
     type: 'website',
   },
