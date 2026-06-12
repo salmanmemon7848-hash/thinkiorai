@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { checkRateLimit, acquireSlot, releaseSlot, incrementGlobalDaily } from "@/lib/rateLimit";
+import { PLAN_GATED_FEATURES, PLAN_NAMES } from "@/lib/constants";
 import {
   deepResearch,
   researchForReport,
@@ -43,6 +44,24 @@ export async function POST(req: NextRequest) {
         { error: "Query or topics required" },
         { status: 400 }
       );
+    }
+
+    // ── Plan-gate: report-mode deep research is Founder Pro only ──
+    if (mode === "report") {
+      const required = PLAN_GATED_FEATURES.report;
+      if (required && plan !== required) {
+        return NextResponse.json(
+          {
+            error: "plan_required",
+            code: "plan_required",
+            feature: "report",
+            requiredPlan: required,
+            currentPlan: plan,
+            message: `Business Reports are a ${PLAN_NAMES[required]} feature.`,
+          },
+          { status: 402 }
+        );
+      }
     }
 
     acquireSlot(user.id);

@@ -31,7 +31,7 @@ const FAQS = [
   },
   {
     q: 'Do you offer refunds?',
-    a: "If you're not satisfied within the first 7 days of a paid plan, email hello@thinkior.com and we'll refund you — no questions asked.",
+    a: 'No. All payments are final and non-refundable.',
   },
   {
     q: 'Is this only for first-time founders?',

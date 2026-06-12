@@ -1,21 +1,36 @@
 'use client'
 
-import { Check } from 'lucide-react'
+import { Check, X } from 'lucide-react'
 import Link from 'next/link'
 
-const PLANS = [
+type PlanFeature = {
+  text: string
+  locked?: boolean
+}
+
+const PLANS: Array<{
+  id: string
+  name: string
+  price: number
+  description: string
+  features: PlanFeature[]
+  cta: string
+  href: string
+  highlighted: boolean
+}> = [
   {
     id: 'free',
     name: 'Free',
     price: 0,
     description: 'For founders sketching the first idea',
     features: [
-      '1 Business Validations / one time',
-      '1 Competitor Research / one time',
-      '1 Ideas sessions / one time',
-      '1 Pitch Evaluation / one time',
-      '5 AI Chat messages / one time',
-      'English & Hindi support',
+      { text: '1 Business Validation / one time' },
+      { text: 'Competitor Research — Builder & above', locked: true },
+      { text: '1 Ideas session / one time' },
+      { text: '1 Pitch Evaluation / one time' },
+      { text: '5 AI Chat messages / one time' },
+      { text: 'Business Reports — Founder Pro only', locked: true },
+      { text: 'English & Hindi support' },
     ],
     cta: 'Start free',
     href: '/signup',
@@ -27,13 +42,14 @@ const PLANS = [
     price: 299,
     description: 'For founders actively building',
     features: [
-      '5 Business Validations / day',
-      '5 Competitor Research / day',
-      '5 Ideas sessions / day',
-      '5 Pitch Evaluations / day',
-      '10 AI Chat messages / day',
-      'All Indian languages',
-      'Saved reports — unlimited',
+      { text: '5 Business Validations / day' },
+      { text: '5 Competitor Research / day' },
+      { text: '5 Ideas sessions / day' },
+      { text: '5 Pitch Evaluations / day' },
+      { text: '10 AI Chat messages / day' },
+      { text: 'Business Reports — Founder Pro only', locked: true },
+      { text: 'All Indian languages' },
+      { text: 'Saved reports — unlimited' },
     ],
     cta: 'Start building',
     href: '/signup?plan=builder',
@@ -45,13 +61,14 @@ const PLANS = [
     price: 599,
     description: 'For founders who move every day',
     features: [
-      '10 Business Validations / day',
-      '10 Competitor Research / day',
-      '10 Ideas sessions / day',
-      '10 Pitch Evaluations / day',
-      '15 AI Chat messages / day',
-      'Priority AI — fastest responses',
-      'Export reports as PDF',
+      { text: '10 Business Validations / day' },
+      { text: '10 Competitor Research / day' },
+      { text: '10 Ideas sessions / day' },
+      { text: '10 Pitch Evaluations / day' },
+      { text: '15 AI Chat messages / day' },
+      { text: '3 Business Reports / day — investor-grade' },
+      { text: 'Priority AI — fastest responses' },
+      { text: 'Export reports as PDF' },
     ],
     cta: 'Go Founder Pro',
     href: '/signup?plan=founder_pro',
@@ -116,14 +133,26 @@ export default function PricingSection() {
 
               <ul className="space-y-3 flex-1 mb-8">
                 {plan.features.map((f) => (
-                  <li key={f} className="flex items-start gap-3 text-[14px] text-fg leading-snug">
-                    <Check
-                      className={`w-4 h-4 flex-shrink-0 mt-0.5 ${
-                        plan.highlighted ? 'text-accent' : 'text-fg-dim'
-                      }`}
-                      strokeWidth={2.5}
-                    />
-                    {f}
+                  <li
+                    key={f.text}
+                    className={`flex items-start gap-3 text-[14px] leading-snug ${
+                      f.locked ? 'text-fg-muted line-through decoration-fg-muted/40' : 'text-fg'
+                    }`}
+                  >
+                    {f.locked ? (
+                      <X
+                        className="w-4 h-4 flex-shrink-0 mt-0.5 text-fg-muted/60"
+                        strokeWidth={2.25}
+                      />
+                    ) : (
+                      <Check
+                        className={`w-4 h-4 flex-shrink-0 mt-0.5 ${
+                          plan.highlighted ? 'text-accent' : 'text-fg-dim'
+                        }`}
+                        strokeWidth={2.5}
+                      />
+                    )}
+                    {f.text}
                   </li>
                 ))}
               </ul>

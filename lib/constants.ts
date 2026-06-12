@@ -3,11 +3,11 @@ import type { PlanLimits, Plan } from '@/types'
 export const PLAN_LIMITS: Record<Plan, PlanLimits> = {
   free: {
     validator: 1,    // 1 Business Validation / one time
-    competitor: 1,   // 1 Competitor Research / one time
+    competitor: 0,   // Locked — Builder & above
     ideas: 1,        // 1 Ideas session / one time
     pitch: 1,        // 1 Pitch Evaluation / one time
     chat: 5,         // 5 AI Chat messages / one time
-    report: 1,
+    report: 0,       // Locked — Founder Pro only
   },
   builder: {
     validator: 5,    // 5 Business Validations / day
@@ -15,7 +15,7 @@ export const PLAN_LIMITS: Record<Plan, PlanLimits> = {
     ideas: 5,        // 5 Ideas sessions / day
     pitch: 5,        // 5 Pitch Evaluations / day
     chat: 10,        // 10 AI Chat messages / day
-    report: 5,
+    report: 0,       // Locked — Founder Pro only
   },
   founder_pro: {
     validator: 10,   // 10 Business Validations / day
@@ -23,8 +23,18 @@ export const PLAN_LIMITS: Record<Plan, PlanLimits> = {
     ideas: 10,       // 10 Ideas sessions / day
     pitch: 10,       // 10 Pitch Evaluations / day
     chat: 15,        // 15 AI Chat messages / day
-    report: 10,
+    report: 3,       // 3 Business Reports / day
   },
+}
+
+/**
+ * Plan-gated features — features that require a minimum plan tier regardless
+ * of daily quota. The route handlers check this BEFORE checking the daily
+ * count so locked plans return a clear "upgrade required" error.
+ */
+export const PLAN_GATED_FEATURES: Partial<Record<keyof PlanLimits, Plan>> = {
+  competitor: 'builder',     // free users cannot use competitor research
+  report: 'founder_pro',     // free + builder cannot use business reports
 }
 
 export const PLAN_PRICES: Record<Plan, number> = {

@@ -1,14 +1,15 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 
 // ── Daily hard caps per plan ─────────────────────────────────────────────────
-// Sum of all per-feature limits to act as an overall guard:
-// free: 1+1+1+1+5 (report excluded from sum) = 9
-// builder: 5+5+5+5+10 = 30
-// founder_pro: 10+10+10+10+15 = 55
+// Sum of UNLOCKED per-feature limits, used as an overall guard:
+// free:    validator(1) + competitor(0) + ideas(1) + pitch(1) + chat(5) + report(0) = 8
+// builder: validator(5) + competitor(5) + ideas(5) + pitch(5) + chat(10) + report(0) = 30
+// founder_pro: validator(10) + competitor(10) + ideas(10) + pitch(10) + chat(15) + report(3) = 58
+// (gated features are blocked by route handlers before this is ever counted)
 export const GLOBAL_DAILY_CAPS: Record<string, number> = {
-  free: 9,
+  free: 8,
   builder: 30,
-  founder_pro: 55,
+  founder_pro: 58,
 }
 
 const MAX_CONCURRENT = 2

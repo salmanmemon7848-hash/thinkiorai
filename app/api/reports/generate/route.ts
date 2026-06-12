@@ -8,7 +8,7 @@ import {
   buildReportUserPrompt,
   type ReportInput,
 } from '@/lib/ai/prompts/report'
-import { PLAN_LIMITS } from '@/lib/constants'
+import { PLAN_LIMITS, PLAN_GATED_FEATURES } from '@/lib/constants'
 import { checkRateLimit, acquireSlot, releaseSlot, incrementGlobalDaily } from '@/lib/rateLimit'
 import { sanitizeString } from '@/lib/utils/sanitize'
 import type { Plan } from '@/types'
@@ -96,6 +96,22 @@ export async function POST(req: NextRequest) {
       .single()
 
     const plan = (profile?.plan ?? 'free') as Plan
+
+    // ── Plan-gate: Business Reports require Founder Pro ─────────
+    const requiredPlan = PLAN_GATED_FEATURES.report
+    if (requiredPlan && plan !== requiredPlan) {
+      return NextResponse.json(
+        {
+          error: 'plan_required',
+          code: 'plan_required',
+          feature: 'report',
+          requiredPlan,
+          currentPlan: plan,
+          message: `Business Reports are a Founder Pro feature. Upgrade to generate investor-grade reports.`,
+        },
+        { status: 402 }
+      )
+    }
 
     // ── Global rate limit (concurrency + cooldown + daily cap) ──
     const rateCheck = await checkRateLimit(user.id, plan, supabase)

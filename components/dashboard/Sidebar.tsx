@@ -17,13 +17,23 @@ import {
   X,
   Sparkles,
   FileText,
+  Lock,
 } from 'lucide-react'
 import { cn } from '@/lib/utils/cn'
 import { useAuth } from '@/contexts/AuthContext'
 import PlanBadge from '@/components/shared/PlanBadge'
 import type { Plan } from '@/types'
 
-const NAV_GROUPS = [
+type NavItem = {
+  icon: typeof LayoutDashboard
+  label: string
+  href: string
+  accent?: string
+  shortcut?: string
+  lockFor?: Plan[]
+}
+
+const NAV_GROUPS: Array<{ label: string; items: NavItem[] }> = [
   {
     label: 'Overview',
     items: [
@@ -34,10 +44,10 @@ const NAV_GROUPS = [
     label: 'Tools',
     items: [
       { icon: CheckCircle2, label: 'Business Validator', href: '/validator', accent: 'accent', shortcut: '1' },
-      { icon: Search, label: 'Competitor Intel', href: '/competitor', accent: 'signal-insight', shortcut: '2' },
+      { icon: Search, label: 'Competitor Intel', href: '/competitor', accent: 'signal-insight', shortcut: '2', lockFor: ['free'] as Plan[] },
       { icon: Lightbulb, label: 'Ideas Desk', href: '/ideas', accent: 'signal-pivot', shortcut: '3' },
       { icon: Presentation, label: 'Pitch Evaluator', href: '/pitch', accent: 'signal-violet', shortcut: '4' },
-      { icon: FileText, label: 'Business Reports', href: '/reports', accent: 'accent', shortcut: '5' },
+      { icon: FileText, label: 'Business Reports', href: '/reports', accent: 'accent', shortcut: '5', lockFor: ['free', 'builder'] as Plan[] },
       { icon: MessageSquare, label: 'Co-founder Desk', href: '/chat', accent: 'fg', shortcut: '6' },
     ],
   },
@@ -99,6 +109,7 @@ function SidebarContent({
               {group.items.map((item) => {
                 const active = pathname === item.href
                 const Icon = item.icon
+                const isLocked = item.lockFor?.includes(plan as Plan)
                 return (
                   <Link
                     key={item.href}
@@ -120,6 +131,13 @@ function SidebarContent({
                       style={active && 'accent' in item ? { color: `var(--${item.accent === 'accent' ? 'accent' : item.accent === 'fg' ? 'fg' : item.accent})` } : undefined}
                     />
                     <span className="flex-1 truncate font-medium">{item.label}</span>
+                    {isLocked && (
+                      <Lock
+                        className="w-3 h-3 text-fg-muted flex-shrink-0"
+                        strokeWidth={2}
+                        aria-label="Locked feature"
+                      />
+                    )}
                     {item.shortcut && (
                       <span className="kbd opacity-0 group-hover:opacity-100 transition-opacity">
                         {item.shortcut}

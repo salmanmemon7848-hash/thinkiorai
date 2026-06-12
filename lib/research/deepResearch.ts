@@ -3,10 +3,40 @@ import * as cheerio from "cheerio";
 
 const SEARXNG = process.env.SEARXNG_URL || "http://localhost:8080";
 
-const groqPrimary = new Groq({ apiKey: process.env.GROQ_API_KEY });
-const groqFallback = new Groq({
-  apiKey: process.env.GROQ_API_KEY_FALLBACK || process.env.GROQ_API_KEY,
-});
+// Lazy Groq clients — instantiated on first use so the module loads
+// cleanly even when env vars are missing (e.g. during `next build`).
+// This avoids "apiKey is required" errors at import time.
+let _groqPrimary: Groq | null = null;
+let _groqFallback: Groq | null = null;
+let _cerebras: Groq | null = null;
+
+function groqPrimary(): Groq {
+  if (!_groqPrimary) {
+    _groqPrimary = new Groq({ apiKey: process.env.GROQ_API_KEY || "" });
+  }
+  return _groqPrimary;
+}
+function groqFallback(): Groq {
+  if (!_groqFallback) {
+    _groqFallback = new Groq({
+      apiKey:
+        process.env.GROQ_API_KEY_FALLBACK ||
+        process.env.GROQ_API_KEY ||
+        "",
+    });
+  }
+  return _groqFallback;
+}
+function cerebrasClient(): Groq | null {
+  if (!process.env.CEREBRAS_API_KEY) return null;
+  if (!_cerebras) {
+    _cerebras = new Groq({
+      apiKey: process.env.CEREBRAS_API_KEY,
+      baseURL: "https://api.cerebras.ai/v1",
+    });
+  }
+  return _cerebras;
+}
 
 const INDIA_PRIORITY_DOMAINS = [
   "inc42.com",
@@ -368,11 +398,29 @@ async function synthesizeWithGroq(
   context: string,
   attempt: number = 1
 ): Promise<DeepResearchResult | null> {
-  const client = attempt === 1 ? groqPrimary : groqFallback;
+  // attempt 1 = primary Groq
+  // attempt 2 = Groq fallback key
+  // attempt 3 = Cerebras
+  const MAX_ATTEMPTS = cerebrasClient() ? 3 : 2;
+
+  let client: Groq;
+  let model: string;
+  if (attempt === 1) {
+    client = groqPrimary();
+    model = "llama-3.3-70b-versatile";
+  } else if (attempt === 2) {
+    client = groqFallback();
+    model = "llama-3.3-70b-versatile";
+  } else if (cerebrasClient()) {
+    client = cerebrasClient()!;
+    model = "llama-3.3-70b";
+  } else {
+    return null;
+  }
 
   try {
     const completion = await client.chat.completions.create({
-      model: "llama-3.3-70b-versatile",
+      model,
       messages: [
         { role: "system", content: SYSTEM_PROMPT },
         {
@@ -388,11 +436,18 @@ async function synthesizeWithGroq(
     const raw = completion.choices[0]?.message?.content || "{}";
     return JSON.parse(raw) as DeepResearchResult;
   } catch (err: any) {
-    if (attempt === 1 && err?.status === 429) {
-      await new Promise((r) => setTimeout(r, 2000));
-      return synthesizeWithGroq(query, context, 2);
+    const status = err?.status;
+    // Retry on rate-limit (429) or transient errors, advance through the
+    // fallback chain (Groq primary → Groq fallback → Cerebras).
+    if ((status === 429 || status >= 500) && attempt < MAX_ATTEMPTS) {
+      const backoff = status === 429 ? 2000 : 1000;
+      await new Promise((r) => setTimeout(r, backoff));
+      return synthesizeWithGroq(query, context, attempt + 1);
     }
-    console.error("[ThinkiorAI] Groq synthesis error:", err?.message);
+    console.error(
+      `[ThinkiorAI] synthesis error (attempt ${attempt}/${MAX_ATTEMPTS}):`,
+      err?.message
+    );
     return null;
   }
 }

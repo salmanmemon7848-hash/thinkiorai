@@ -1,6 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { FileText, Plus, ArrowUpRight, Sparkles } from 'lucide-react'
+import type { Plan } from '@/types'
+import PlanRequired from '@/components/shared/PlanRequired'
 
 export const metadata = {
   title: 'Business Reports — Thinkior AI',
@@ -20,6 +22,25 @@ export default async function ReportsPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser()
+
+  // Plan check (server-side, no flash of paywalled content)
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('plan')
+    .eq('id', user!.id)
+    .single()
+  const plan = (profile?.plan ?? 'free') as Plan
+
+  if (plan !== 'founder_pro') {
+    return (
+      <PlanRequired
+        featureName="Business Reports"
+        requiredPlan="founder_pro"
+        currentPlan={plan}
+        description="Investor-grade, India-first business reports backed by live market research. Founder Pro only."
+      />
+    )
+  }
 
   const { data: reports } = await supabase
     .from('business_reports')

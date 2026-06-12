@@ -8,13 +8,22 @@ import { getIdeasPrompt } from '@/lib/ai/prompts/ideas'
 import { getPitchPrompt } from '@/lib/ai/prompts/pitch'
 import { getChatPrompt } from '@/lib/ai/prompts/chat'
 import { getFounderContextBlock } from '@/lib/ai/prompts/masterPrompts'
-import { PLAN_LIMITS } from '@/lib/constants'
+import { PLAN_LIMITS, PLAN_GATED_FEATURES, PLAN_NAMES } from '@/lib/constants'
 import { checkRateLimit, acquireSlot, releaseSlot, incrementGlobalDaily } from '@/lib/rateLimit'
 import { searxSearch, formatSearchContext } from '@/lib/search/searxng'
 import { buildSearchQuery } from '@/lib/knowledge/thinkiorKnowledge'
 import type { Plan, Feature } from '@/types'
 
 const SEARCH_FEATURES = new Set(['competitor', 'validator', 'ideas'])
+
+const FEATURE_LABEL: Record<string, string> = {
+  validator: 'Business Validator',
+  competitor: 'Competitor Research',
+  ideas: 'Business Ideas',
+  pitch: 'Pitch Evaluator',
+  chat: 'AI Chat',
+  report: 'Business Reports',
+}
 
 const COMPLEXITY: Record<string, 'simple' | 'complex'> = {
   validator: 'complex',
@@ -114,6 +123,22 @@ export async function POST(req: NextRequest) {
       .single()
 
     const plan = (profile?.plan ?? 'free') as Plan
+
+    // ── Plan-gate: some features require a paid plan tier ───────
+    const requiredPlan = PLAN_GATED_FEATURES[feature]
+    if (requiredPlan && plan !== requiredPlan) {
+      return NextResponse.json(
+        {
+          error: 'plan_required',
+          code: 'plan_required',
+          feature,
+          requiredPlan,
+          currentPlan: plan,
+          message: `${FEATURE_LABEL[feature]} requires the ${PLAN_NAMES[requiredPlan]} plan or above.`,
+        },
+        { status: 402 }
+      )
+    }
 
     // ── Global rate limit (concurrency + cooldown + daily cap) ──
     const rateCheck = await checkRateLimit(user.id, plan, supabase)
