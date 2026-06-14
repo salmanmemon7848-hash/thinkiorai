@@ -124,20 +124,39 @@ export default function ReportViewer({ report }: { report: AnyObj }) {
   const ref = useRef<HTMLDivElement>(null)
   const [dl, setDl] = useState(false)
 
-  const meta = obj(report.meta)
-  const es = obj(report.executive_summary)
-  const bo = obj(report.business_overview)
-  const ma = obj(report.market_analysis)
-  const ca = obj(report.competitor_analysis)
-  const sw = obj(report.swot_analysis)
-  const ms = obj(report.marketing_strategy)
-  const gs = obj(report.growth_strategy)
-  const fa = obj(report.financial_analysis)
-  const km = obj(report.kpis_and_metrics)
-  const ap = obj(report.action_plan)
-  const rm = obj(report.roadmap)
-  const ri = arr<AnyObj>(report.risks_and_mitigation)
-  const rc = obj(report.recommendations)
+  // Defensive: a stored report row could in theory have
+  // report_data === null (e.g. partial save). Don't crash the page
+  // — render a clear empty state instead.
+  const safeReport: AnyObj = report && typeof report === 'object' ? report : {}
+
+  const meta = obj(safeReport.meta)
+  const es = obj(safeReport.executive_summary)
+  const bo = obj(safeReport.business_overview)
+  const ma = obj(safeReport.market_analysis)
+  const ca = obj(safeReport.competitor_analysis)
+  const sw = obj(safeReport.swot_analysis)
+  const ms = obj(safeReport.marketing_strategy)
+  const gs = obj(safeReport.growth_strategy)
+  const fa = obj(safeReport.financial_analysis)
+  const km = obj(safeReport.kpis_and_metrics)
+  const ap = obj(safeReport.action_plan)
+  const rm = obj(safeReport.roadmap)
+  const ri = arr<AnyObj>(safeReport.risks_and_mitigation)
+  const rc = obj(safeReport.recommendations)
+
+  if (!report || typeof report !== 'object') {
+    return (
+      <div className="card-premium rounded-2xl p-10 text-center">
+        <p className="font-display font-semibold text-base text-fg mb-1.5">
+          This report could not be loaded
+        </p>
+        <p className="text-[13px] text-fg-muted max-w-md mx-auto">
+          The saved report data is missing or malformed. Please re-generate
+          the report.
+        </p>
+      </div>
+    )
+  }
 
   async function downloadPDF() {
     if (!ref.current) return

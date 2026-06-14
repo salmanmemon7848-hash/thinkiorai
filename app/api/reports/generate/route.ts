@@ -11,6 +11,7 @@ import {
 import { PLAN_LIMITS, PLAN_GATED_FEATURES } from '@/lib/constants'
 import { checkRateLimit, acquireSlot, releaseSlot, incrementGlobalDaily } from '@/lib/rateLimit'
 import { sanitizeString } from '@/lib/utils/sanitize'
+import { safeParseJson } from '@/lib/ai/jsonRepair'
 import type { Plan } from '@/types'
 
 export const maxDuration = 60
@@ -173,26 +174,54 @@ export async function POST(req: NextRequest) {
     }
 
     const raw = completion.choices[0]?.message?.content ?? ''
-    // If the AI response is not valid JSON (e.g., plain error text), return a clear error.
-    const isJson = raw.trim().startsWith('{') || raw.trim().startsWith('[')
-    if (!isJson) {
-      console.error('[reports/generate] Unexpected non‑JSON response from Groq:', raw)
+    // Parse the model's response. The model is asked for raw JSON
+    // but can still emit a stray preamble, code fences, an error
+    // string like "An error occurred", or truncated JSON when
+    // max_tokens is hit. safeParseJson handles all of those and
+    // never throws — we either get a value or a clean 502.
+    const parsed = safeParseJson(raw)
+    if (!parsed.ok) {
+      console.error(
+        '[reports/generate] AI did not return valid JSON:',
+        parsed.error,
+        '| repaired:', parsed.repaired,
+        '| extracted:', parsed.extracted,
+        '| raw[0..200]:',
+        raw.slice(0, 200)
+      )
       return NextResponse.json(
-        { error: 'AI provider returned an invalid response. Please try again later.' },
+        {
+          error:
+            'The AI did not return a valid report. Please try again — if it keeps failing, the model may be rate-limited.',
+          details: parsed.error,
+        },
         { status: 502 }
       )
     }
-    let report: Record<string, unknown>
-    try {
-      report = JSON.parse(raw)
-    } catch {
-      // Attempt to clean Markdown code fences if present
-      const stripped = raw.replace(/```json|```/g, '').trim()
-      report = JSON.parse(stripped)
+    if (parsed.repaired || parsed.extracted) {
+      console.warn(
+        '[reports/generate] Had to repair AI JSON: repaired=%s extracted=%s',
+        parsed.repaired,
+        parsed.extracted
+      )
+    }
+    const report = parsed.value as Record<string, unknown>
+
+    // Defensive: if the model returned a JSON array or a primitive,
+    // wrap it into an object so the downstream code (which assumes
+    // `report.meta`, `report.executive_summary`, etc.) doesn't throw
+    // a confusing error. This is rare but happens.
+    let reportObj: Record<string, unknown>
+    if (report && typeof report === 'object' && !Array.isArray(report)) {
+      reportObj = report
+    } else if (Array.isArray(report)) {
+      reportObj = { meta: {}, executive_summary: {}, _raw_array: report }
+    } else {
+      reportObj = { meta: {}, executive_summary: {} }
     }
 
-    const meta = (report.meta ?? {}) as Record<string, unknown>
-    report.meta = {
+    const meta = (reportObj.meta ?? {}) as Record<string, unknown>
+    reportObj.meta = {
       ...meta,
       business_name: meta.business_name || input.businessName || 'Untitled',
       industry: meta.industry || input.industry,
@@ -210,7 +239,7 @@ export async function POST(req: NextRequest) {
         industry: input.industry,
         stage: input.businessStage,
         input_data: input,
-        report_data: report,
+        report_data: reportObj,
       })
       .select('id')
       .single()
@@ -233,7 +262,10 @@ export async function POST(req: NextRequest) {
         user_id: user.id,
         feature: 'report',
         title: `${input.reportType} — ${input.businessName || input.industry}`,
-        summary: (report.executive_summary as Record<string, unknown>)?.verdict?.toString().slice(0, 200) ?? '',
+        summary:
+          (reportObj.executive_summary as Record<string, unknown> | undefined)?.verdict
+            ?.toString()
+            .slice(0, 200) ?? '',
         metadata: { report_id: saved.id },
       }),
     ])

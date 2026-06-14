@@ -46,7 +46,13 @@ export default async function SharedReportPage({
       </header>
 
       <main className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
-        <ReportViewer report={report.report_data as Record<string, unknown>} />
+        <ReportViewer
+          report={
+            report.report_data && typeof report.report_data === 'object'
+              ? (report.report_data as Record<string, unknown>)
+              : {}
+          }
+        />
 
         <footer className="mt-12 text-center">
           <p className="text-[11px] text-fg-faint font-mono">
