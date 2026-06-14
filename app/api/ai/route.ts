@@ -12,6 +12,7 @@ import { PLAN_LIMITS, PLAN_GATED_FEATURES, PLAN_NAMES } from '@/lib/constants'
 import { checkRateLimit, acquireSlot, releaseSlot, incrementGlobalDaily } from '@/lib/rateLimit'
 import { searxSearch, formatSearchContext } from '@/lib/search/searxng'
 import { buildSearchQuery } from '@/lib/knowledge/thinkiorKnowledge'
+import { parseThinkiorCard } from '@/lib/ai/cardParser'
 import type { Plan, Feature } from '@/types'
 
 const SEARCH_FEATURES = new Set(['competitor', 'validator', 'ideas'])
@@ -47,6 +48,27 @@ function getSystemPrompt(feature: string, lastUserMessage: string): string {
     default:
       return getChatPrompt(lastUserMessage)
   }
+}
+
+/**
+ * Extract the structured `THINKIOR_CARD` block from a chat response
+ * and validate it. Validator, Competitor, Pitch, and Ideas produce
+ * cards. Other features will be wired up in later phases.
+ */
+function extractCardForFeature(feature: string, text: string): unknown | null {
+  if (feature === 'validator') {
+    return parseThinkiorCard(text, 'validator').card ?? null
+  }
+  if (feature === 'competitor') {
+    return parseThinkiorCard(text, 'competitor').card ?? null
+  }
+  if (feature === 'pitch') {
+    return parseThinkiorCard(text, 'pitch').card ?? null
+  }
+  if (feature === 'ideas') {
+    return parseThinkiorCard(text, 'ideas').card ?? null
+  }
+  return null
 }
 
 /**
@@ -178,7 +200,9 @@ export async function POST(req: NextRequest) {
       supabase.from('founder_profiles').select('*').eq('user_id', user.id).single(),
       supabase
         .from('founder_sessions')
-        .select('module, session_title, verdict, score, summary')
+        .select(
+          'module, session_title, verdict, score, summary, card_data, card_kind, score_100'
+        )
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(5),
@@ -236,13 +260,32 @@ export async function POST(req: NextRequest) {
     // ── Save session to founder_sessions for memory ─────────────
     try {
       const extracted = extractScoreAndVerdict(response.result)
+      const card = extractCardForFeature(feature, response.result) as
+        | Record<string, unknown>
+        | null
+
+      // Pull headline / score_100 out of the structured card so the
+      // next chat turn can reference them without re-parsing the
+      // full LLM response.
+      const cardHeadline =
+        (card?.headline as string | undefined) ||
+        (card?.tagline as string | undefined) ||
+        null
+      const cardScore100 =
+        typeof card?.score === 'number' ? Math.round(card.score) : null
+
       await supabase.from('founder_sessions').insert({
         user_id: user.id,
         module: feature,
-        session_title: founderProfile?.idea_name || lastUserMessage.slice(0, 60),
+        session_title: cardHeadline
+          ? cardHeadline.slice(0, 80)
+          : founderProfile?.idea_name || lastUserMessage.slice(0, 60),
         verdict: extracted.verdict,
         score: extracted.score,
-        summary: extracted.summary || response.result.slice(0, 100),
+        summary: extracted.summary || cardHeadline || response.result.slice(0, 100),
+        card_data: card,
+        card_kind: card ? feature : null,
+        score_100: cardScore100,
         full_output: {
           messages,
           result: response.result,
@@ -253,7 +296,20 @@ export async function POST(req: NextRequest) {
       // Non-critical — don't fail the request if session save fails
     }
 
-    return NextResponse.json({ reply: response.result, provider: response.provider })
+    return NextResponse.json({
+      reply: response.result,
+      provider: response.provider,
+      // Structured card payload, if the model emitted one. The
+      // frontend uses this to render rich cards below the chat bubble.
+      card: extractCardForFeature(feature, response.result),
+      cardKind:
+        feature === 'validator' ||
+        feature === 'competitor' ||
+        feature === 'pitch' ||
+        feature === 'ideas'
+          ? feature
+          : null,
+    })
   } catch (err) {
     console.error('[API/AI]', err)
     return NextResponse.json(

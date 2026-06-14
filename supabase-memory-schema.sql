@@ -30,8 +30,19 @@ CREATE TABLE IF NOT EXISTS public.founder_sessions (
   score         NUMERIC(4,1),
   summary       TEXT,
   full_output   JSONB,
-  created_at    TIMESTAMPTZ DEFAULT NOW()
+  -- Phase 6 (Co-founder Desk): structured card payload so the chat
+  -- can reference past Validator/Pitch/Ideas/Competitor results.
+  card_data     JSONB,
+  card_kind     TEXT,
+  score_100     INTEGER,
+  created_at    TIMESTPTZ DEFAULT NOW()
 );
+
+-- Idempotent column adds for installs that pre-date the Phase 6 change
+ALTER TABLE public.founder_sessions
+  ADD COLUMN IF NOT EXISTS card_data JSONB,
+  ADD COLUMN IF NOT EXISTS card_kind TEXT,
+  ADD COLUMN IF NOT EXISTS score_100 INTEGER;
 
 -- ── DPDP Consent records ─────────────────────────────────────
 CREATE TABLE IF NOT EXISTS public.user_consents (
@@ -91,3 +102,6 @@ CREATE TRIGGER trg_founder_profiles_updated
 CREATE INDEX IF NOT EXISTS idx_founder_sessions_user ON public.founder_sessions(user_id);
 CREATE INDEX IF NOT EXISTS idx_founder_sessions_module ON public.founder_sessions(user_id, module);
 CREATE INDEX IF NOT EXISTS idx_founder_sessions_created ON public.founder_sessions(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_founder_sessions_card_kind
+  ON public.founder_sessions(user_id, card_kind, created_at DESC)
+  WHERE card_kind IS NOT NULL;

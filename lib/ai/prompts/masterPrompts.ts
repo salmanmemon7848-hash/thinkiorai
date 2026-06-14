@@ -21,14 +21,53 @@ export function getFounderContextBlock(profile: any, sessions: any[]): string {
     scaling: 'scaling — ₹1L+ MRR, growing fast',
   }
 
-  const recentVerdicts = (sessions || [])
-    .slice(0, 3)
-    .filter((s: any) => s.verdict || s.score)
-    .map(
-      (s: any) =>
-        `  • [${(s.module || '').toUpperCase()}] "${s.session_title || 'Untitled'}" → ${s.verdict || ''} ${s.score ? `(${s.score}/10)` : ''}`
-    )
+  // Render each recent session with the richest data we have. We
+  // pull from the new card_data / score_100 / card_kind fields
+  // (Phase 6) and fall back to the legacy verdict/score when those
+  // are missing.
+  const recentLines = (sessions || [])
+    .slice(0, 5)
+    .map((s: any) => {
+      const mod = (s.module || '').toUpperCase()
+      const title = s.session_title || 'Untitled'
+      const headline = s.card_data?.headline || s.card_data?.tagline || ''
+      const score100 = s.score_100
+      const score10 = s.score
+      const verdict = s.verdict
+
+      let scoreStr = ''
+      if (typeof score100 === 'number') scoreStr = ` (${score100}/100)`
+      else if (typeof score10 === 'number') scoreStr = ` (${score10}/10)`
+
+      const verdictStr = verdict ? ` → ${verdict}` : ''
+      const headlineStr = headline ? ` — "${headline.slice(0, 80)}"` : ''
+      return `  • [${mod}] "${title}"${verdictStr}${scoreStr}${headlineStr}`
+    })
     .join('\n')
+
+  // For the chat, also surface the most relevant card details as a
+  // separate "what to reference" block so the model can pull
+  // specifics (first_customer, weakest_slide, etc.) without
+  // re-parsing headlines.
+  const cardDigests = (sessions || [])
+    .slice(0, 3)
+    .filter((s: any) => s.card_data)
+    .map((s: any) => {
+      const c = s.card_data
+      const mod = (s.module || '').toUpperCase()
+      const out: string[] = [`  [${mod}]`]
+      if (c.first_customer) out.push(`    first_customer: ${c.first_customer}`)
+      if (c.first_revenue) out.push(`    first_revenue: ${c.first_revenue}`)
+      if (c.red_flag) out.push(`    red_flag: ${c.red_flag}`)
+      if (c.weakest_slide?.topic) out.push(`    weakest_slide: ${c.weakest_slide.topic}`)
+      if (c.kill_your_raise) out.push(`    kill_your_raise: ${c.kill_your_raise}`)
+      if (c.pivot_to_go) out.push(`    pivot_to_go: ${c.pivot_to_go}`)
+      if (c.competitors?.[0]?.name)
+        out.push(`    main_competitor: ${c.competitors[0].name} (${c.competitors[0].weakness || ''})`)
+      if (c.headline) out.push(`    headline: ${c.headline}`)
+      return out.join('\n')
+    })
+    .join('\n\n')
 
   return `
 ╔══════════════════════════════════════════════════════════════╗
@@ -47,14 +86,20 @@ export function getFounderContextBlock(profile: any, sessions: any[]): string {
 ╠══════════════════════════════════════════════════════════════╣
 ║  BIGGEST CHALLENGE: ${(profile.biggest_challenge || 'Not specified').substring(0, 41).padEnd(41)}║
 ╠══════════════════════════════════════════════════════════════╣
-║  PREVIOUS SESSIONS:                                          ║
-${recentVerdicts ? recentVerdicts.split('\n').map((l: string) => `║  ${l.padEnd(60)}║`).join('\n') : '║  No previous sessions.                                       ║'}
+║  RECENT THINKIOR SESSIONS (most recent first):               ║
+${recentLines ? recentLines.split('\n').map((l: string) => `║  ${l.padEnd(60)}║`).join('\n') : '║  No previous sessions yet.                                    ║'}
+╠══════════════════════════════════════════════════════════════╣
+║  DETAILS TO REFERENCE NATURALLY:                             ║
+${cardDigests ? cardDigests.split('\n').map((l: string) => `║  ${l.padEnd(60)}║`).join('\n') : '║  No structured results yet. Run Validator / Pitch / etc.    ║'}
 ╚══════════════════════════════════════════════════════════════╝
 
 INSTRUCTION: You already know everything above. Reference it naturally.
 Never ask "what is your startup idea?" or "what domain are you in?" —
-you already know. Address their biggest challenge directly. If they
-have previous verdicts, reference those results when contextually relevant.
+you already know. Address their biggest challenge directly. When they
+ask a vague question, use the structured card data above to give
+specific, contextual advice ("Your last Validator flagged the
+unit-economics issue — want to revisit pricing?"). Use the verdict,
+score, red flag, and first_customer fields as raw material.
 `.trim()
 }
 

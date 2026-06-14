@@ -21,6 +21,9 @@ interface AIChatInterfaceProps {
   icon: React.ReactNode
   starters: string[]
   accentColor?: string
+  /** Optional replacement for the default starter chips. Receives
+   *  the parent's sendMessage so chips can fire messages. */
+  customStarters?: React.ReactNode
 }
 
 const ACCENT_MAP: Record<string, { text: string; bg: string; border: string; cssVar: string }> = {
@@ -38,6 +41,7 @@ export default function AIChatInterface({
   icon,
   starters,
   accentColor = 'accent',
+  customStarters,
 }: AIChatInterfaceProps) {
   const { messages, loading, error, sendMessage, clearMessages } = useChat(feature)
   const { usage, refetch } = useUsage(feature)
@@ -88,15 +92,22 @@ export default function AIChatInterface({
     const assistantMsgs = messages.filter((m) => m.role === 'assistant')
     if (assistantMsgs.length === 0) return null
 
-    const lastText = assistantMsgs[assistantMsgs.length - 1].content
+    const last = assistantMsgs[assistantMsgs.length - 1]
 
-    // Strict: must be GO verdict
+    // Prefer the structured card payload (the new way). Fall back to
+    // the old text regex for backward compatibility with old sessions
+    // that don't have a card.
+    const card = last.card as { verdict?: string; confidence?: string } | null
+    if (card && card.verdict === 'GO' && card.confidence === 'High') {
+      return { verdict: 'GO' as const, confidence: 'High' as const }
+    }
+
+    const lastText = last.content
     const verdictMatch = lastText.match(/VERDICT:\s*(GO|KILL|PIVOT)/i)
     if (!verdictMatch) return null
     const verdict = verdictMatch[1].toUpperCase()
     if (verdict !== 'GO') return null
 
-    // Confidence must be High
     const confMatch = lastText.match(/Confidence:\s*\**\s*(High|Medium|Low)/i)
     if (!confMatch) return null
     const confidence = confMatch[1]
@@ -191,30 +202,36 @@ export default function AIChatInterface({
       <div className="flex-1 overflow-y-auto space-y-6 pb-4 pr-1">
         {messages.length === 0 && !loading && (
           <div className="py-6">
-            <p className="font-display font-semibold text-base text-fg mb-1.5 tracking-tight">
-              Start anywhere
-            </p>
-            <p className="text-sm text-fg-muted mb-6">
-              Type your question below, or try one of these openings.
-            </p>
-            <div className="grid sm:grid-cols-2 gap-3 max-w-3xl">
-              {starters.map((s, i) => (
-                <button
-                  key={s}
-                  onClick={() => sendMessage(s)}
-                  className="card-premium text-left p-4 rounded-lg hover:bg-bg-elevated transition-all duration-300 group"
-                >
-                  <div className="flex items-start gap-3">
-                    <span className="font-mono text-[10px] uppercase tracking-caps text-fg-muted mt-0.5 tabular">
-                      {String(i + 1).padStart(2, '0')}
-                    </span>
-                    <p className="text-[13.5px] text-fg-dim group-hover:text-fg leading-relaxed transition-colors">
-                      {s}
-                    </p>
-                  </div>
-                </button>
-              ))}
-            </div>
+            {customStarters ? (
+              customStarters
+            ) : (
+              <>
+                <p className="font-display font-semibold text-base text-fg mb-1.5 tracking-tight">
+                  Start anywhere
+                </p>
+                <p className="text-sm text-fg-muted mb-6">
+                  Type your question below, or try one of these openings.
+                </p>
+                <div className="grid sm:grid-cols-2 gap-3 max-w-3xl">
+                  {starters.map((s, i) => (
+                    <button
+                      key={s}
+                      onClick={() => sendMessage(s)}
+                      className="card-premium text-left p-4 rounded-lg hover:bg-bg-elevated transition-all duration-300 group"
+                    >
+                      <div className="flex items-start gap-3">
+                        <span className="font-mono text-[10px] uppercase tracking-caps text-fg-muted mt-0.5 tabular">
+                          {String(i + 1).padStart(2, '0')}
+                        </span>
+                        <p className="text-[13.5px] text-fg-dim group-hover:text-fg leading-relaxed transition-colors">
+                          {s}
+                        </p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
         )}
 
@@ -222,7 +239,12 @@ export default function AIChatInterface({
           msg.role === 'user' ? (
             <UserMessage key={i} content={msg.content} />
           ) : (
-            <AIMessage key={i} content={msg.content} />
+            <AIMessage
+              key={i}
+              content={msg.content}
+              card={msg.card ?? null}
+              cardKind={msg.cardKind ?? null}
+            />
           )
         )}
 

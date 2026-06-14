@@ -1,8 +1,19 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
-import { FileText, Plus, ArrowUpRight, Sparkles } from 'lucide-react'
+import {
+  FileText,
+  Plus,
+  ArrowUpRight,
+  Sparkles,
+  Search,
+  Map,
+  Rocket,
+  Presentation,
+  type LucideIcon,
+} from 'lucide-react'
 import type { Plan } from '@/types'
 import PlanRequired from '@/components/shared/PlanRequired'
+import ReportsBrowser from '@/components/features/reports/ReportsBrowser'
 
 export const metadata = {
   title: 'Business Reports — Thinkior AI',
@@ -15,6 +26,8 @@ interface ReportRow {
   industry: string
   stage: string | null
   created_at: string
+  share_enabled: boolean
+  share_slug: string | null
 }
 
 export default async function ReportsPage() {
@@ -44,10 +57,12 @@ export default async function ReportsPage() {
 
   const { data: reports } = await supabase
     .from('business_reports')
-    .select('id, business_name, report_type, industry, stage, created_at')
+    .select(
+      'id, business_name, report_type, industry, stage, created_at, share_enabled, share_slug'
+    )
     .eq('user_id', user!.id)
     .order('created_at', { ascending: false })
-    .limit(50)
+    .limit(200)
 
   const rows = (reports ?? []) as ReportRow[]
 
@@ -63,8 +78,10 @@ export default async function ReportsPage() {
             Business reports.{' '}
             <span className="font-serif-italic font-normal text-accent">Investor-grade.</span>
           </h1>
-          <p className="text-[14px] text-fg-dim mt-2">
-            Deep, structured reports for your business — backed by live market research.
+          <p className="text-[14px] text-fg-dim mt-2 max-w-xl">
+            Deep, structured reports for your business — backed by live market
+            research. Pick a template, answer 5 questions, get a 30-page strategy
+            memo in 30 seconds.
           </p>
         </div>
         <Link
@@ -85,7 +102,8 @@ export default async function ReportsPage() {
             No reports yet
           </h2>
           <p className="text-[13px] text-fg-muted mb-6 max-w-sm mx-auto">
-            Generate your first investor-grade business report — takes about 30 seconds.
+            Generate your first investor-grade business report — takes about 30
+            seconds.
           </p>
           <Link
             href="/reports/new"
@@ -96,38 +114,7 @@ export default async function ReportsPage() {
           </Link>
         </div>
       ) : (
-        <div className="space-y-2">
-          {rows.map((r) => (
-            <Link
-              key={r.id}
-              href={`/reports/${r.id}`}
-              className="card-premium rounded-lg p-4 flex items-center gap-4 hover:bg-bg-elevated transition-colors group"
-            >
-              <div className="w-9 h-9 rounded-md bg-bg-elevated border border-line flex items-center justify-center flex-shrink-0">
-                <FileText className="w-4 h-4 text-fg-dim group-hover:text-accent transition-colors" strokeWidth={1.75} />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <h3 className="font-display font-semibold text-[14px] text-fg tracking-tight truncate">
-                    {r.business_name || 'Untitled'}
-                  </h3>
-                  <span className="text-[11px] text-fg-muted font-mono">
-                    · {r.report_type}
-                  </span>
-                </div>
-                <p className="text-[12px] text-fg-muted mt-0.5">
-                  {r.industry} · {r.stage ?? 'Unspecified stage'} ·{' '}
-                  {new Date(r.created_at).toLocaleDateString('en-US', {
-                    month: 'short',
-                    day: 'numeric',
-                    year: 'numeric',
-                  })}
-                </p>
-              </div>
-              <ArrowUpRight className="w-4 h-4 text-fg-muted group-hover:text-fg group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-all flex-shrink-0" />
-            </Link>
-          ))}
-        </div>
+        <ReportsBrowser reports={rows} />
       )}
     </div>
   )

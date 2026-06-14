@@ -3,8 +3,17 @@
 import { useState, useCallback } from 'react'
 import type { ChatMessage, Feature } from '@/types'
 
+/**
+ * A message in the chat, optionally carrying a parsed structured
+ * card payload (Validator scorecard, Competitor map, etc).
+ */
+export interface ChatMessageWithCard extends ChatMessage {
+  card?: unknown | null
+  cardKind?: 'validator' | 'preview' | null
+}
+
 export function useChat(feature: Feature) {
-  const [messages, setMessages] = useState<ChatMessage[]>([])
+  const [messages, setMessages] = useState<ChatMessageWithCard[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -12,7 +21,7 @@ export function useChat(feature: Feature) {
     async (content: string) => {
       if (!content.trim() || loading) return
 
-      const userMessage: ChatMessage = {
+      const userMessage: ChatMessageWithCard = {
         role: 'user',
         content: content.trim(),
         timestamp: new Date().toISOString(),
@@ -36,7 +45,7 @@ export function useChat(feature: Feature) {
         })
 
         if (!res.ok) {
-          const err = await res.json()
+          const err = await res.json().catch(() => ({}))
           if (res.status === 429) {
             setError('daily_limit')
           } else {
@@ -46,10 +55,12 @@ export function useChat(feature: Feature) {
         }
 
         const data = await res.json()
-        const assistantMessage: ChatMessage = {
+        const assistantMessage: ChatMessageWithCard = {
           role: 'assistant',
           content: data.reply,
           timestamp: new Date().toISOString(),
+          card: data.card ?? null,
+          cardKind: data.cardKind ?? null,
         }
         setMessages((prev) => [...prev, assistantMessage])
       } catch {

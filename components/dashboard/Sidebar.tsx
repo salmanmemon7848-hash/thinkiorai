@@ -18,6 +18,8 @@ import {
   Sparkles,
   FileText,
   Lock,
+  Command,
+  ChevronRight,
 } from 'lucide-react'
 import { cn } from '@/lib/utils/cn'
 import { useAuth } from '@/contexts/AuthContext'
@@ -41,7 +43,7 @@ const NAV_GROUPS: Array<{ label: string; items: NavItem[] }> = [
     ],
   },
   {
-    label: 'Tools',
+    label: 'Founder OS',
     items: [
       { icon: CheckCircle2, label: 'Business Validator', href: '/validator', accent: 'accent', shortcut: '1' },
       { icon: Search, label: 'Competitor Intel', href: '/competitor', accent: 'signal-insight', shortcut: '2', lockFor: ['free'] as Plan[] },
@@ -64,6 +66,14 @@ interface SidebarProps {
   plan: string
 }
 
+const ACCENT_VAR: Record<string, string> = {
+  accent: '--accent',
+  'signal-insight': '--signal-insight',
+  'signal-pivot': '--signal-pivot',
+  'signal-violet': '--signal-violet',
+  fg: '--fg',
+}
+
 function SidebarContent({
   userName,
   userEmail,
@@ -82,19 +92,28 @@ function SidebarContent({
   return (
     <div className="flex flex-col h-full bg-bg-sub border-r border-line relative">
       {/* Header / wordmark */}
-      <div className="px-5 py-5 border-b border-line">
-        <Link href="/dashboard" onClick={onClose} className="flex items-baseline gap-1.5">
-          <span className="wordmark text-fg text-[19px]">Thinkior</span>
-          <span className="wordmark-ai text-[17px]">Ai</span>
+      <div className="px-5 pt-5 pb-4">
+        <Link
+          href="/dashboard"
+          onClick={onClose}
+          className="flex items-baseline gap-1.5 group"
+        >
+          <span className="wordmark text-fg text-[20px] tracking-tight">Thinkior</span>
+          <span className="wordmark-ai text-[18px]">Ai</span>
         </Link>
+        <p className="text-[10.5px] font-mono uppercase tracking-caps text-fg-faint mt-1.5">
+          Founder OS
+        </p>
       </div>
 
-      {/* Search-style command pill */}
-      <div className="px-3 pt-4">
-        <button className="w-full flex items-center justify-between gap-2 bg-bg-card hover:bg-bg-elevated border border-line hover:border-line-strong rounded-md px-3 py-2 transition-colors text-left">
+      {/* Quick command */}
+      <div className="px-3">
+        <button className="w-full flex items-center justify-between gap-2 bg-bg-card hover:bg-bg-elevated border border-line hover:border-line-strong rounded-md px-3 py-2 transition-colors text-left group">
           <div className="flex items-center gap-2 min-w-0">
-            <Search className="w-3.5 h-3.5 text-fg-muted flex-shrink-0" />
-            <span className="text-[13px] text-fg-muted truncate">Quick command</span>
+            <Command className="w-3.5 h-3.5 text-fg-muted flex-shrink-0" />
+            <span className="text-[12.5px] text-fg-dim group-hover:text-fg truncate transition-colors">
+              Quick command
+            </span>
           </div>
           <span className="kbd flex-shrink-0">⌘K</span>
         </button>
@@ -103,13 +122,14 @@ function SidebarContent({
       {/* Nav */}
       <nav className="flex-1 px-3 py-5 overflow-y-auto">
         {NAV_GROUPS.map((group) => (
-          <div key={group.label} className="mb-6">
-            <p className="eyebrow px-2 mb-2">{group.label}</p>
+          <div key={group.label} className="mb-5 last:mb-0">
+            <p className="eyebrow px-2 mb-2 text-fg-faint">{group.label}</p>
             <div className="space-y-0.5">
               {group.items.map((item) => {
-                const active = pathname === item.href
+                const active = pathname === item.href || pathname?.startsWith(item.href + '/')
                 const Icon = item.icon
                 const isLocked = item.lockFor?.includes(plan as Plan)
+                const accentVar = item.accent ? ACCENT_VAR[item.accent] : null
                 return (
                   <Link
                     key={item.href}
@@ -123,23 +143,37 @@ function SidebarContent({
                     )}
                   >
                     {active && (
-                      <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-accent rounded-r-full" />
+                      <>
+                        <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-accent rounded-r-full" />
+                        <span
+                          className="absolute inset-0 rounded-md pointer-events-none"
+                          style={{
+                            background:
+                              'linear-gradient(90deg, color-mix(in srgb, var(--accent) 8%, transparent), transparent 60%)',
+                          }}
+                          aria-hidden="true"
+                        />
+                      </>
                     )}
                     <Icon
-                      className="w-4 h-4 flex-shrink-0"
+                      className="w-4 h-4 flex-shrink-0 transition-colors"
                       strokeWidth={1.75}
-                      style={active && 'accent' in item ? { color: `var(--${item.accent === 'accent' ? 'accent' : item.accent === 'fg' ? 'fg' : item.accent})` } : undefined}
+                      style={
+                        active && accentVar
+                          ? { color: `var(${accentVar})` }
+                          : undefined
+                      }
                     />
                     <span className="flex-1 truncate font-medium">{item.label}</span>
                     {isLocked && (
                       <Lock
-                        className="w-3 h-3 text-fg-muted flex-shrink-0"
+                        className="w-3 h-3 text-fg-faint flex-shrink-0"
                         strokeWidth={2}
                         aria-label="Locked feature"
                       />
                     )}
                     {item.shortcut && (
-                      <span className="kbd opacity-0 group-hover:opacity-100 transition-opacity">
+                      <span className="kbd opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
                         {item.shortcut}
                       </span>
                     )}
@@ -150,7 +184,7 @@ function SidebarContent({
           </div>
         ))}
 
-        <div className="pt-4 border-t border-line">
+        <div className="pt-4 border-t border-line mt-4">
           <div className="space-y-0.5">
             {BOTTOM_ITEMS.map((item) => {
               const active = pathname === item.href
@@ -161,14 +195,15 @@ function SidebarContent({
                   href={item.href}
                   onClick={onClose}
                   className={cn(
-                    'flex items-center gap-3 px-2.5 py-2 rounded-md text-[13px] transition-colors',
+                    'group flex items-center gap-3 px-2.5 py-2 rounded-md text-[13px] transition-colors',
                     active
                       ? 'bg-bg-card text-fg'
                       : 'text-fg-dim hover:text-fg hover:bg-bg-card/60'
                   )}
                 >
-                  <Icon className="w-4 h-4" strokeWidth={1.75} />
-                  <span className="font-medium">{item.label}</span>
+                  <Icon className="w-4 h-4 flex-shrink-0" strokeWidth={1.75} />
+                  <span className="flex-1 font-medium">{item.label}</span>
+                  <ChevronRight className="w-3 h-3 text-fg-faint opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all flex-shrink-0" />
                 </Link>
               )
             })}
@@ -181,33 +216,39 @@ function SidebarContent({
         <div className="mx-3 mb-3">
           <Link
             href="/pricing"
-            className="block card-premium rounded-lg p-3.5 hover:bg-bg-elevated transition-colors group"
+            className="block card-premium rounded-lg p-3.5 hover:bg-bg-elevated transition-colors group relative overflow-hidden"
           >
+            <span
+              className="absolute inset-x-0 top-0 h-px bg-accent/30"
+              aria-hidden="true"
+            />
             <div className="flex items-center gap-2 mb-2">
               <Sparkles className="w-3.5 h-3.5 text-accent" />
-              <span className="text-[11px] font-mono uppercase tracking-caps text-accent font-semibold">
-                Upgrade
+              <span className="text-[10.5px] font-mono uppercase tracking-caps text-accent font-semibold">
+                Upgrade to Builder
               </span>
             </div>
-            <p className="text-[13px] text-fg leading-snug mb-3">
-              Get more queries, all languages, saved reports.
+            <p className="text-[12.5px] text-fg leading-snug mb-3">
+              More queries, all languages, saved reports.
             </p>
             <span className="inline-flex items-center gap-1.5 text-[12px] font-medium text-accent group-hover:gap-2 transition-all">
               See plans
-              <span className="text-base">→</span>
+              <span className="text-base leading-none">→</span>
             </span>
           </Link>
         </div>
       )}
 
       {/* User footer */}
-      <div className="border-t border-line px-3 py-3 bg-bg">
-        <div className="flex items-center gap-2.5 px-1.5 py-1">
-          <div className="w-8 h-8 rounded-md bg-gradient-to-br from-accent to-signal-insight flex items-center justify-center font-display font-semibold text-xs text-bg flex-shrink-0">
+      <div className="border-t border-line bg-bg">
+        <div className="flex items-center gap-2.5 px-3 py-3">
+          <div className="w-8 h-8 rounded-md bg-gradient-to-br from-accent to-signal-insight flex items-center justify-center font-display font-semibold text-[12px] text-bg flex-shrink-0">
             {userName.charAt(0).toUpperCase()}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-[13px] font-medium text-fg truncate leading-tight">{userName}</p>
+            <p className="text-[12.5px] font-medium text-fg truncate leading-tight">
+              {userName}
+            </p>
             <div className="mt-0.5">
               <PlanBadge plan={plan as Plan} />
             </div>

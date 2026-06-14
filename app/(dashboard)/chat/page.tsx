@@ -1,9 +1,9 @@
-import AIChatPage from '@/components/features/AIChatPage'
+import CoFounderChat from '@/components/features/CoFounderChat'
 
 export const metadata = {
-  title: 'AI Chat — Thinkior AI',
+  title: 'Co-founder Desk — Thinkior AI',
 }
 
 export default function ChatPage() {
-  return <AIChatPage />
+  return <CoFounderChat />
 }
