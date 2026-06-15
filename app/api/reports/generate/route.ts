@@ -53,22 +53,50 @@ function cleanInput(raw: unknown): ReportInput | null {
   }
 }
 
-async function groqCompletionCall(groq: Groq, input: ReportInput, searchContext: string) {
-  return Promise.race([
-    groq.chat.completions.create({
-      model: 'llama-3.3-70b-versatile',
-      messages: [
-        { role: 'system', content: getReportSystemPrompt(input) },
-        { role: 'user', content: buildReportUserPrompt(input, searchContext) },
-      ],
-      temperature: 0.4,
-      max_tokens: 5500,
-      response_format: { type: 'json_object' },
-    }),
-    new Promise<never>((_, reject) =>
-      setTimeout(() => reject(new Error('Groq timeout')), 55000)
-    ),
-  ])
+// Model fallback list — tried in order. If the primary model is
+// rate-limited or unavailable, the next model is attempted automatically.
+const GROQ_MODELS = [
+  'llama-3.3-70b-versatile',
+  'llama-3.1-70b-versatile',
+  'mixtral-8x7b-32768',
+  'llama-3.1-8b-instant',
+]
+
+async function groqCompletionWithFallback(
+  groq: Groq,
+  input: ReportInput,
+  searchContext: string
+) {
+  let lastErr: unknown
+  for (const model of GROQ_MODELS) {
+    try {
+      console.log('[reports/generate] trying model:', model)
+      const result = await Promise.race([
+        groq.chat.completions.create({
+          model,
+          messages: [
+            { role: 'system', content: getReportSystemPrompt(input) },
+            { role: 'user', content: buildReportUserPrompt(input, searchContext) },
+          ],
+          temperature: 0.4,
+          max_tokens: 6000,
+          response_format: { type: 'json_object' },
+        }),
+        new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error('Groq timeout after 55s')), 55000)
+        ),
+      ])
+      console.log('[reports/generate] model %s succeeded', model)
+      return result
+    } catch (err) {
+      lastErr = err
+      const msg = err instanceof Error ? err.message : String(err)
+      console.warn('[reports/generate] model %s failed: %s', model, msg)
+      // Do not retry on hard timeout — we're already near the 60s function limit
+      if (msg.includes('timeout')) break
+    }
+  }
+  throw lastErr
 }
 
 export async function POST(req: NextRequest) {
@@ -246,19 +274,29 @@ export async function POST(req: NextRequest) {
 
     // ── Acquire slot — released in finally regardless of outcome ─
     acquireSlot(user.id)
-    let completion: Awaited<ReturnType<typeof groqCompletionCall>>
+    let completion: Awaited<ReturnType<typeof groqCompletionWithFallback>>
     const tGroqStart = Date.now()
     try {
       const groq = new Groq({ apiKey })
-      completion = await groqCompletionCall(groq, input, searchContext)
+      completion = await groqCompletionWithFallback(groq, input, searchContext)
       console.log('[reports/generate] groq ok in %dms', Date.now() - tGroqStart)
     } catch (err) {
+      const elapsed = Date.now() - tGroqStart
+      const msg = err instanceof Error ? err.message : String(err)
       console.error(
-        '[reports/generate] groq failed after %dms:',
-        Date.now() - tGroqStart,
-        err instanceof Error ? err.message : err
+        '[reports/generate] all groq models failed after %dms: %s',
+        elapsed,
+        msg
       )
-      throw err
+      // Return a descriptive error — do NOT re-throw to the catch-all
+      // so the user sees *what* failed, not just the generic message.
+      return NextResponse.json(
+        {
+          error: 'The AI provider could not generate your report. Please try again in a moment.',
+          details: msg.length > 300 ? msg.slice(0, 300) + '…' : msg,
+        },
+        { status: 502 }
+      )
     } finally {
       releaseSlot(user.id)
     }

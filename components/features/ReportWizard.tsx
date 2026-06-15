@@ -118,7 +118,7 @@ export default function ReportWizard() {
     }, 3500)
 
     try {
-      const data = await safeFetchJson<{ reportId?: string; error?: string; message?: string }>(
+      const data = await safeFetchJson<{ reportId?: string; error?: string; message?: string; details?: string }>(
         '/api/reports/generate',
         {
           method: 'POST',
@@ -127,7 +127,10 @@ export default function ReportWizard() {
         }
       )
       if (!data.reportId) {
-        throw new Error(data.message || data.error || 'Generation failed')
+        // Include details if server provided them
+        const base = data.message || data.error || 'Generation failed'
+        const detail = data.details ? ` (${data.details})` : ''
+        throw new Error(base + detail)
       }
       clearInterval(ticker)
       router.push(`/reports/${data.reportId}`)
