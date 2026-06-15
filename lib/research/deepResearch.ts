@@ -1,5 +1,6 @@
 import Groq from "groq-sdk";
 import * as cheerio from "cheerio";
+import { tavilySearch } from "./tavily";
 
 const SEARXNG = process.env.SEARXNG_URL || "http://localhost:8080";
 
@@ -18,8 +19,12 @@ function groqPrimary(): Groq {
 }
 function groqFallback(): Groq {
   if (!_groqFallback) {
+    // Read the same env vars the report route uses so the fallback
+    // chain stays consistent. _2 / _3 are the canonical names; we
+    // also accept the legacy _FALLBACK for backward compatibility.
     _groqFallback = new Groq({
       apiKey:
+        process.env.GROQ_API_KEY_2 ||
         process.env.GROQ_API_KEY_FALLBACK ||
         process.env.GROQ_API_KEY ||
         "",
@@ -308,7 +313,7 @@ async function scrapeWithIndiaPriority(
 function buildResearchContext(
   query: string,
   searchResults: RawSearchResult[],
-  scrapedPages: ScrapedPage[]
+  tavilyRawByUrl: Map<string, string>
 ): string {
   const indiaResults = searchResults.filter((r) =>
     INDIA_PRIORITY_DOMAINS.some((d) => r.url.includes(d))
@@ -333,17 +338,26 @@ function buildResearchContext(
     });
   }
 
-  context += `\n${"=".repeat(60)}\n=== FULL PAGE CONTENT ===\n`;
+  context += `\n${"=".repeat(60)}\n=== FULL PAGE CONTENT (Tavily raw_content) ===\n`;
 
-  const indianPages = scrapedPages.filter((p) => p.isIndianSource);
-  const globalPages = scrapedPages.filter((p) => !p.isIndianSource);
+  // Build a per-result view that includes the full page text where
+  // available. We still prefer Indian sources first.
+  const withRaw = searchResults
+    .map((r) => ({
+      r,
+      raw: tavilyRawByUrl.get(r.url) ?? "",
+      isIndia: INDIA_PRIORITY_DOMAINS.some((d) => r.url.includes(d)),
+    }))
+    .filter((p) => p.raw.length > 0)
+    .sort((a, b) => Number(b.isIndia) - Number(a.isIndia));
 
-  [...indianPages, ...globalPages].forEach((page, i) => {
-    context += `\n[PAGE ${i + 1}] ${page.title}\n`;
-    context += `URL: ${page.url}\n`;
-    context += `Source Type: ${page.isIndianSource ? "INDIAN SOURCE" : "Global Source"}\n`;
-    context += `Words: ${page.wordCount}\n`;
-    context += `---\n${page.text.slice(0, 3000)}\n\n`;
+  withRaw.forEach((p, i) => {
+    const wordCount = p.raw.split(/\s+/).length;
+    context += `\n[PAGE ${i + 1}] ${p.r.title}\n`;
+    context += `URL: ${p.r.url}\n`;
+    context += `Source Type: ${p.isIndia ? "INDIAN SOURCE" : "Global Source"}\n`;
+    context += `Words: ${wordCount}\n`;
+    context += `---\n${p.raw.slice(0, 3000)}\n\n`;
   });
 
   return context;
@@ -457,9 +471,16 @@ export async function deepResearch(
   options: {
     depth?: "quick" | "standard" | "deep";
     forceIndia?: boolean;
+    /**
+     * Tavily search depth. "advanced" returns full cleaned page
+     * content per result (uses 2 credits/query) — best for the
+     * report flow. "basic" returns just the snippet (1 credit) —
+     * best for high-volume live chat. Default: "advanced".
+     */
+    searchDepth?: "basic" | "advanced";
   } = {}
 ): Promise<DeepResearchResult> {
-  const { depth = "standard" } = options;
+  const { depth = "standard", searchDepth = "advanced" } = options;
 
   const config = {
     quick: { searchResults: 5, scrapeCount: 3 },
@@ -467,24 +488,58 @@ export async function deepResearch(
     deep: { searchResults: 15, scrapeCount: 10 },
   }[depth];
 
+  // Tavily handles geo better than SearXNG ever did — it understands
+  // "India" in the query and returns Indian sources first. We still
+  // run a second query specifically about India for redundancy.
   const [mainResults, indiaResults] = await Promise.all([
-    searchSearXNG(query, config.searchResults),
-    searchSearXNG(`${query} India startup market 2024 2025`, 5),
+    tavilySearch(query, { maxResults: config.searchResults, depth: searchDepth }),
+    tavilySearch(`${query} India startup market 2024 2025`, {
+      maxResults: 5,
+      depth: searchDepth,
+    }),
   ]);
 
-  const seen = new Set<string>();
-  const allResults = [...mainResults, ...indiaResults].filter((r) => {
-    if (seen.has(r.url)) return false;
-    seen.add(r.url);
-    return true;
-  });
+  // Map Tavily results into the existing RawSearchResult shape so
+  // the rest of this file (which still knows about RawSearchResult
+  // for backward compat) doesn't need surgery.
+  const seen = new Set<string>()
+  const allResults = [...mainResults, ...indiaResults]
+    .map((r) => ({
+      title: r.title,
+      url: r.url,
+      snippet: r.snippet,
+      engine: r.engine,
+    }))
+    .filter((r) => {
+      if (!r.url || seen.has(r.url)) return false
+      seen.add(r.url)
+      return true
+    })
 
-  const scrapedPages = await scrapeWithIndiaPriority(
+  // We previously scraped each result's URL with cheerio to extract
+  // full page text. Tavily's "advanced" depth already returns
+  // cleaned raw_content per result, so we no longer need a separate
+  // HTTP fetch + HTML parse step. This used to add 6 parallel page
+  // loads per topic (~8s of network) — now it's zero.
+  //
+  // For the (rare) case where Tavily basic is used and rawContent
+  // is empty, the synthesize step falls back to the snippet. The
+  // legacy scrapeWithIndiaPriority function is still defined below
+  // for code-dormancy reasons (SearXNG fallback path) but is no
+  // longer invoked from the main pipeline.
+  const tavilyRawByUrl = new Map<string, string>()
+  for (const r of mainResults) {
+    if (r.rawContent) tavilyRawByUrl.set(r.url, r.rawContent)
+  }
+  for (const r of indiaResults) {
+    if (r.rawContent) tavilyRawByUrl.set(r.url, r.rawContent)
+  }
+
+  const context = buildResearchContext(
+    query,
     allResults,
-    config.scrapeCount
+    tavilyRawByUrl
   );
-
-  const context = buildResearchContext(query, allResults, scrapedPages);
 
   const result = await synthesizeWithGroq(query, context);
 

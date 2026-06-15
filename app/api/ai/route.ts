@@ -11,6 +11,7 @@ import { getFounderContextBlock } from '@/lib/ai/prompts/masterPrompts'
 import { PLAN_LIMITS, PLAN_GATED_FEATURES, PLAN_NAMES } from '@/lib/constants'
 import { checkRateLimit, acquireSlot, releaseSlot, incrementGlobalDaily } from '@/lib/rateLimit'
 import { searxSearch, formatSearchContext } from '@/lib/search/searxng'
+import { tavilySearch } from '@/lib/research/tavily'
 import { buildSearchQuery } from '@/lib/knowledge/thinkiorKnowledge'
 import { parseThinkiorCard } from '@/lib/ai/cardParser'
 import type { Plan, Feature } from '@/types'
@@ -221,8 +222,16 @@ export async function POST(req: NextRequest) {
     let searchContext = ''
     if (SEARCH_FEATURES.has(feature)) {
       const query = buildSearchQuery(feature, lastUserMessage)
-      const results = await searxSearch(query)
-      searchContext = formatSearchContext(results)
+      // Live chat / validator / competitor / ideas — use Tavily
+      // "basic" depth (1 credit per query) since these features are
+      // high-volume. The deeper "advanced" depth is reserved for the
+      // business report flow where quality matters more.
+      // The legacy searxSearch() is still imported above as a dormant
+      // fallback — see lib/search/searxng.ts.
+      const results = await tavilySearch(query, { maxResults: 6, depth: 'basic' })
+      searchContext = formatSearchContext(
+        results.map((r) => ({ title: r.title, url: r.url, content: r.snippet }))
+      )
     }
 
     const conversationPrompt =

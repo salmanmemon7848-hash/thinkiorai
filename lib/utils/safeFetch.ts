@@ -102,6 +102,7 @@ export async function safeFetchJson<T = unknown>(
       serverMsg =
         (typeof p.message === 'string' && p.message) ||
         (typeof p.error === 'string' && p.error) ||
+        (typeof p.details === 'string' && p.details) ||
         (typeof p.detail === 'string' && p.detail) ||
         ''
     }

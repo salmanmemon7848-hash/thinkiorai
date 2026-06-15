@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Groq from 'groq-sdk'
 import { createClient } from '@/lib/supabase/server'
-import { researchForReport } from '@/lib/research/deepResearch'
+import { deepResearch } from '@/lib/research/deepResearch'
 import {
   getReportSystemPrompt,
   buildReportSearchQueries,
@@ -148,27 +148,91 @@ export async function POST(req: NextRequest) {
     }
 
     const queries = buildReportSearchQueries(input)
-    // Run all research topics in parallel but cap the total wall-clock
-    // time so we never blow past Vercel's function timeout. The
-    // Vercel function is configured for 60s on Pro; we leave 20s of
-    // headroom for the Groq completion + DB write + buffer.
-    // On Hobby (10s cap) the route will still finish research, fail
-    // at the Groq step, and return a 502 — that path now shows a
-    // clean error in the UI instead of the gateway HTML.
-    const RESEARCH_BUDGET_MS = 35_000
-    const researchPromise = researchForReport(queries)
-    const research = await Promise.race([
-      researchPromise,
-      new Promise<Record<string, unknown>>((_, reject) =>
-        setTimeout(
-          () => reject(new Error('Research budget exceeded')),
-          RESEARCH_BUDGET_MS
-        )
-      ),
-    ]) as Awaited<ReturnType<typeof researchForReport>>
+    // Research is best-effort. If SearXNG is unreachable (common on
+    // serverless deploys hitting a public instance), the per-topic
+    // calls will time out individually. We give research a HARD 8s
+    // total budget; if it doesn't come back, we proceed with empty
+    // context and let Groq generate the report from the founder's
+    // own input plus the model's general knowledge.
+    //
+    // This was the cause of "Could not generate report" — research
+    // was eating the whole 60s window when SearXNG timed out, leaving
+    // no time for the Groq completion + DB write.
+    const RESEARCH_BUDGET_MS = 8_000
+    type TopicResult = NonNullable<Awaited<ReturnType<typeof deepResearch>>>
+    const emptyTopic: TopicResult = {
+      query: '',
+      intent_type: '',
+      india_relevance: '',
+      sub_questions: [],
+      key_findings: [],
+      market_data: {
+        india_market_size: 'unknown',
+        growth_rate: 'unknown',
+        key_players_india: [],
+        market_stage: 'unknown',
+      },
+      sources_used: [],
+      data_points: [],
+      contradictions_or_gaps: [],
+      synthesis: '',
+      india_opportunities: [],
+      india_risks: [],
+      confidence_score: '',
+      data_freshness: '',
+      follow_up_queries: [],
+      summary: '',
+    }
+
+    let research: Record<string, TopicResult> = {}
+    try {
+      const researchPromise = Promise.all(
+        queries.map(async (topic): Promise<[string, TopicResult]> => {
+          try {
+            const result = await deepResearch(topic, { depth: 'quick' })
+            return [topic, result]
+          } catch (err) {
+            console.warn(
+              '[reports/generate] topic research failed (continuing without):',
+              topic,
+              err instanceof Error ? err.message : err
+            )
+            return [topic, emptyTopic]
+          }
+        })
+      )
+      const researchEntries = (await Promise.race([
+        researchPromise,
+        new Promise<never>((_, reject) =>
+          setTimeout(
+            () => reject(new Error('Research budget exceeded')),
+            RESEARCH_BUDGET_MS
+          )
+        ),
+      ])) as Array<[string, TopicResult]>
+      research = Object.fromEntries(researchEntries) as Record<string, TopicResult>
+      console.log(
+        '[reports/generate] research ok: %d/%d topics returned in <%dms',
+        Object.values(research).filter((r) => r.summary || r.synthesis).length,
+        queries.length,
+        RESEARCH_BUDGET_MS
+      )
+    } catch (err) {
+      // Research is best-effort. Log it and continue with empty context
+      // so the founder still gets a report. This is the path that
+      // SearXNG-down requests hit.
+      console.warn(
+        '[reports/generate] research step failed/timed out, continuing with empty context:',
+        err instanceof Error ? err.message : err
+      )
+      research = Object.fromEntries(queries.map((q) => [q, emptyTopic] as [string, TopicResult]))
+    }
+
     const searchContext = Object.entries(research)
-      .map(([topic, data]) =>
-        `\n## Research: ${topic}\n${data.synthesis}\n\nKey Findings:\n${data.key_findings.join('\n')}\n\nData Points:\n${data.data_points.join('\n')}\n\nMarket Data: ${data.market_data.india_market_size} | Growth: ${data.market_data.growth_rate} | Players: ${data.market_data.key_players_india.join(', ')}`
+      .filter(([, data]) => data.synthesis || data.key_findings.length > 0)
+      .map(
+        ([topic, data]) =>
+          `\n## Research: ${topic}\n${data.synthesis}\n\nKey Findings:\n${data.key_findings.join('\n')}\n\nData Points:\n${data.data_points.join('\n')}\n\nMarket Data: ${data.market_data.india_market_size} | Growth: ${data.market_data.growth_rate} | Players: ${data.market_data.key_players_india.join(', ')}`
       )
       .join('\n\n')
 
@@ -183,9 +247,18 @@ export async function POST(req: NextRequest) {
     // ── Acquire slot — released in finally regardless of outcome ─
     acquireSlot(user.id)
     let completion: Awaited<ReturnType<typeof groqCompletionCall>>
+    const tGroqStart = Date.now()
     try {
       const groq = new Groq({ apiKey })
       completion = await groqCompletionCall(groq, input, searchContext)
+      console.log('[reports/generate] groq ok in %dms', Date.now() - tGroqStart)
+    } catch (err) {
+      console.error(
+        '[reports/generate] groq failed after %dms:',
+        Date.now() - tGroqStart,
+        err instanceof Error ? err.message : err
+      )
+      throw err
     } finally {
       releaseSlot(user.id)
     }
@@ -269,7 +342,13 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    await Promise.all([
+    // Post-save telemetry (daily usage + activity log). These are
+    // bookkeeping, not part of the deliverable. If any of them fail,
+    // we log and continue — the report itself is already saved and
+    // that's what matters for the user. (Promise.all would otherwise
+    // kill the success response if just one of these hiccupped.)
+    const tSideEffects = Date.now()
+    const sideEffects = await Promise.allSettled([
       supabase.from('daily_usage').upsert(
         { user_id: user.id, feature: 'report', date: today, count: currentCount + 1 },
         { onConflict: 'user_id,feature,date' }
@@ -286,12 +365,39 @@ export async function POST(req: NextRequest) {
         metadata: { report_id: saved.id },
       }),
     ])
+    sideEffects.forEach((res, i) => {
+      if (res.status === 'rejected') {
+        console.error(
+          '[reports/generate] non-critical side effect %d failed:',
+          i,
+          res.reason instanceof Error ? res.reason.message : res.reason
+        )
+      }
+    })
+    console.log(
+      '[reports/generate] side effects done in %dms (ok=%d/%d)',
+      Date.now() - tSideEffects,
+      sideEffects.filter((r) => r.status === 'fulfilled').length,
+      sideEffects.length
+    )
 
     return NextResponse.json({ success: true, reportId: saved.id })
   } catch (err) {
-    console.error('[reports/generate]', err)
+    // Log the full error server-side (with stack) AND surface a
+    // short reason to the client. The user sees something useful
+    // ("AI provider timeout", "Database connection failed", etc.)
+    // instead of the generic "Could not generate report".
+    console.error('[reports/generate] unhandled error:', err)
+    const message =
+      err instanceof Error ? err.message : 'Unknown error'
+    // Truncate to keep response size sane and avoid leaking internals.
+    const safeMessage =
+      message.length > 200 ? message.slice(0, 200) + '…' : message
     return NextResponse.json(
-      { error: 'Could not generate report. Please try again.' },
+      {
+        error: 'Could not generate report. Please try again.',
+        details: safeMessage,
+      },
       { status: 500 }
     )
   }
