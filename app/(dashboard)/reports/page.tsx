@@ -55,7 +55,12 @@ export default async function ReportsPage() {
     )
   }
 
-  const { data: reports } = await supabase
+  // ── Fetch reports list ──────────────────────────────────────────
+  // Try with share columns first; if the migration hasn't been applied,
+  // fall back to core columns so the page still works.
+  let rows: ReportRow[] = []
+
+  const { data, error } = await supabase
     .from('business_reports')
     .select(
       'id, business_name, report_type, industry, stage, created_at, share_enabled, share_slug'
@@ -64,7 +69,23 @@ export default async function ReportsPage() {
     .order('created_at', { ascending: false })
     .limit(200)
 
-  const rows = (reports ?? []) as ReportRow[]
+  if (error) {
+    // share columns likely missing — retry without them
+    console.warn('[reports] full query failed, retrying core columns:', error.message)
+    const { data: fallback } = await supabase
+      .from('business_reports')
+      .select('id, business_name, report_type, industry, stage, created_at')
+      .eq('user_id', user!.id)
+      .order('created_at', { ascending: false })
+      .limit(200)
+    rows = ((fallback ?? []) as unknown as ReportRow[]).map((r) => ({
+      ...r,
+      share_enabled: false,
+      share_slug: null,
+    }))
+  } else {
+    rows = (data ?? []) as ReportRow[]
+  }
 
   return (
     <div className="space-y-8 animate-fade-in">

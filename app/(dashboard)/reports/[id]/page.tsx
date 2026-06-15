@@ -19,19 +19,19 @@ export default async function ReportPage({ params }: { params: { id: string } })
     data: { user },
   } = await supabase.auth.getUser()
 
-  // Two distinct error paths:
-  //   1. Row is missing entirely (or RLS hid it) — 404.
-  //   2. Row exists but belongs to another user — 404-style page
-  //      that says "this report is owned by a different account"
-  //      so the founder knows what happened.
+  // ── Load report ───────────────────────────────────────────────
+  // Use select('*') so the query NEVER fails due to missing columns.
+  // The share_slug / share_enabled columns come from a migration that
+  // may or may not have been applied — select('*') works either way.
+  // For a single row this has negligible overhead.
   const { data: report, error } = await supabase
     .from('business_reports')
-    .select('id, user_id, report_data, share_slug, share_enabled')
+    .select('*')
     .eq('id', params.id)
     .maybeSingle()
 
   if (error) {
-    // Real DB error — log it for diagnosis and show a clean 404.
+    // Real DB error — log it for diagnosis and show a clean error page.
     console.error('[reports/[id]] query error:', error.message)
     return <ReportNotFound reason="query_error" reportId={params.id} />
   }
@@ -54,6 +54,9 @@ export default async function ReportPage({ params }: { params: { id: string } })
       ? (report.report_data as Record<string, unknown>)
       : {}
 
+  // share columns may not exist if the migration hasn't been applied
+  const hasShareColumns = 'share_slug' in report
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-3 flex-wrap">
@@ -63,11 +66,13 @@ export default async function ReportPage({ params }: { params: { id: string } })
         >
           <ArrowLeft className="w-3.5 h-3.5" /> All reports
         </Link>
-        <ShareButton
-          reportId={report.id}
-          initialEnabled={!!report.share_enabled}
-          initialSlug={report.share_slug}
-        />
+        {hasShareColumns && (
+          <ShareButton
+            reportId={report.id}
+            initialEnabled={!!report.share_enabled}
+            initialSlug={report.share_slug}
+          />
+        )}
       </div>
       <ReportViewer report={reportData} />
     </div>
