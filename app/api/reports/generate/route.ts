@@ -15,41 +15,33 @@ import type { Plan } from '@/types'
 
 export const maxDuration = 60
 
-// ── Provider endpoints (same as lib/ai/handler.ts) ──────────────────────────
-const PROVIDER_ENDPOINTS = {
+// ── Provider config — mirrors lib/ai/handler.ts exactly ──────────────────────
+const ENDPOINTS = {
   groq: 'https://api.groq.com/openai/v1/chat/completions',
   cerebras: 'https://api.cerebras.ai/v1/chat/completions',
 } as const
 
-type Provider = keyof typeof PROVIDER_ENDPOINTS
+type Provider = keyof typeof ENDPOINTS
 
-// Best models per provider for long-form JSON generation
-const PROVIDER_MODELS: Record<Provider, string[]> = {
-  groq: [
-    'llama-3.3-70b-versatile',
-    'llama-3.1-70b-versatile',
-    'llama-3.1-8b-instant',
-  ],
-  cerebras: ['llama-3.3-70b'],
-}
+// Use the SAME models as handler.ts — these are proven to work
+const MODELS = {
+  groq: 'llama-3.3-70b-versatile',
+  cerebras: 'llama-3.3-70b',
+} as const
 
 interface KeyCandidate {
   provider: Provider
   key: string
-  model: string
 }
 
 /**
- * Build an ordered list of (provider, key, model) candidates.
- * Mirrors getKeyCandidates() in lib/ai/handler.ts so reports get
- * the same robust key-rotation + Cerebras fallback that chat features use.
+ * Build key candidates in EXACTLY the same order as aiHandler's
+ * getKeyCandidates() — this is proven to work for all other features.
  */
-function getAllKeyCandidates(): KeyCandidate[] {
+function getKeyCandidates(): KeyCandidate[] {
   const out: KeyCandidate[] = []
   const env = process.env
 
-  // Groq keys — try every model for each key (rotated per minute to spread load)
-  const groqKeys: string[] = []
   for (const name of [
     'GROQ_API_KEY',
     'GROQ_API_KEY_2',
@@ -58,26 +50,15 @@ function getAllKeyCandidates(): KeyCandidate[] {
     'GROQ_FALLBACK_API_KEY_2',
     'GROQ_FALLBACK_API_KEY_3',
   ]) {
-    if (env[name]) groqKeys.push(env[name]!)
+    if (env[name]) out.push({ provider: 'groq', key: env[name]! })
   }
-  // Add primary model for each Groq key first (best quality), then fallback models
-  for (const model of PROVIDER_MODELS.groq) {
-    for (const key of groqKeys) {
-      out.push({ provider: 'groq', key, model })
-    }
-  }
-
-  // Cerebras keys — no response_format support but good as last resort
   for (const name of [
     'CEREBRAS_API_KEY',
     'CEREBRAS_FALLBACK_API_KEY_1',
     'CEREBRAS_FALLBACK_API_KEY_2',
   ]) {
-    if (env[name]) {
-      out.push({ provider: 'cerebras', key: env[name]!, model: PROVIDER_MODELS.cerebras[0] })
-    }
+    if (env[name]) out.push({ provider: 'cerebras', key: env[name]! })
   }
-
   return out
 }
 
@@ -108,53 +89,59 @@ function cleanInput(raw: unknown): ReportInput | null {
   }
 }
 
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
+
 /**
- * Call one provider/key/model combo. Returns raw content string.
- * Throws a tagged error on failure so the caller can decide to retry.
+ * Call one provider — uses the EXACT same fetch pattern as
+ * lib/ai/handler.ts callProvider() which works for all other features.
+ * The only difference: report-specific prompts and higher max_tokens.
+ *
+ * IMPORTANT: No response_format — some models reject it with 400.
+ * The system prompt already tells the model to return raw JSON.
  */
-async function callProviderForReport(
+async function callProvider(
   candidate: KeyCandidate,
   input: ReportInput,
   searchContext: string
 ): Promise<string> {
-  const body: Record<string, unknown> = {
-    model: candidate.model,
+  const model = MODELS[candidate.provider]
+  const url = ENDPOINTS[candidate.provider]
+
+  const body = {
+    model,
     messages: [
       { role: 'system', content: getReportSystemPrompt(input) },
       { role: 'user', content: buildReportUserPrompt(input, searchContext) },
     ],
+    max_tokens: 4096,
     temperature: 0.4,
-    max_tokens: 6000,
-  }
-  // Groq supports JSON-object mode; Cerebras does not — rely on prompt instruction
-  if (candidate.provider === 'groq') {
-    body.response_format = { type: 'json_object' }
   }
 
-  const res = await fetch(PROVIDER_ENDPOINTS[candidate.provider], {
+  // Use the same fetch call as aiHandler — proven to work
+  const res = await fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${candidate.key}`,
     },
     body: JSON.stringify(body),
-    signal: AbortSignal.timeout(50_000),
+    signal: AbortSignal.timeout(25_000),
   })
 
   if (!res.ok) {
-    const errText = await res.text().catch(() => '')
-    const preview = errText.slice(0, 300)
-    const err = new Error(
-      `${candidate.provider} ${candidate.model} HTTP ${res.status}: ${preview}`
-    ) as Error & { status?: number }
+    const err = new Error(`${candidate.provider} HTTP ${res.status}`) as Error & {
+      status?: number
+      provider?: string
+    }
     err.status = res.status
+    err.provider = candidate.provider
     throw err
   }
 
   const data = (await res.json()) as {
     choices?: Array<{ message?: { content?: string | null } }>
   }
-  return data.choices?.[0]?.message?.content ?? ''
+  return (data.choices?.[0]?.message?.content ?? '').trim()
 }
 
 export async function POST(req: NextRequest) {
@@ -270,7 +257,7 @@ export async function POST(req: NextRequest) {
             return [topic, result]
           } catch (err) {
             console.warn(
-              '[reports/generate] topic research failed (continuing without):',
+              '[reports/generate] topic research failed:',
               topic,
               err instanceof Error ? err.message : err
             )
@@ -281,10 +268,7 @@ export async function POST(req: NextRequest) {
       const researchEntries = (await Promise.race([
         researchPromise,
         new Promise<never>((_, reject) =>
-          setTimeout(
-            () => reject(new Error('Research budget exceeded')),
-            RESEARCH_BUDGET_MS
-          )
+          setTimeout(() => reject(new Error('Research budget exceeded')), RESEARCH_BUDGET_MS)
         ),
       ])) as Array<[string, TopicResult]>
       research = Object.fromEntries(researchEntries) as Record<string, TopicResult>
@@ -300,46 +284,62 @@ export async function POST(req: NextRequest) {
       )
       .join('\n\n')
 
-    // ── AI generation — multi-provider key rotation ───────────────
-    const candidates = getAllKeyCandidates()
+    // ── AI generation — same retry strategy as aiHandler ─────────
+    const candidates = getKeyCandidates()
     if (candidates.length === 0) {
       return NextResponse.json(
-        {
-          error: 'AI provider not configured. Please set GROQ_API_KEY in your Vercel environment variables.',
-        },
+        { error: 'No AI API keys configured. Set GROQ_API_KEY in Vercel env vars.' },
         { status: 500 }
       )
     }
 
+    // Use same MAX_ATTEMPTS and retry logic as aiHandler (proven to work)
+    const MAX_ATTEMPTS = Math.min(3, candidates.length)
+    const lastErrors: string[] = []
+
     acquireSlot(user.id)
     let rawContent = ''
-    const generationErrors: string[] = []
     const tStart = Date.now()
 
     try {
-      for (let i = 0; i < candidates.length; i++) {
+      for (let i = 0; i < MAX_ATTEMPTS; i++) {
         const candidate = candidates[i]
+
         try {
-          console.log(
-            `[reports/generate] trying ${candidate.provider} key#${Math.floor(i / PROVIDER_MODELS.groq.length) + 1} model=${candidate.model}`
-          )
-          rawContent = await callProviderForReport(candidate, input, searchContext)
-          if (rawContent) {
-            console.log(
-              `[reports/generate] ${candidate.provider}/${candidate.model} ok in ${Date.now() - tStart}ms`
-            )
-            break
+          rawContent = await Promise.race([
+            callProvider(candidate, input, searchContext),
+            new Promise<never>((_, reject) =>
+              setTimeout(() => reject(new Error('Report generation timeout')), 28_000)
+            ),
+          ])
+
+          if (!rawContent || rawContent.length === 0) {
+            throw new Error('Empty response from provider')
           }
-          throw new Error('Empty response from provider')
+
+          console.log(
+            '[reports/generate] %s ok in %dms (attempt %d)',
+            candidate.provider,
+            Date.now() - tStart,
+            i + 1
+          )
+          break // success
         } catch (err) {
           const msg = err instanceof Error ? err.message : String(err)
           const status = (err as { status?: number }).status
-          generationErrors.push(`${candidate.provider}/${candidate.model}: ${msg}`)
-          console.warn(`[reports/generate] candidate failed: ${msg}`)
-          // 4xx other than 429 = bad request — no point trying more keys
+          lastErrors.push(`${candidate.provider}#${i + 1}: ${msg}`)
+
+          // 4xx other than 429 → auth error, try next key
+          // But do NOT abort — just continue to next candidate
           if (status && status >= 400 && status < 500 && status !== 429) {
-            console.error('[reports/generate] non-retryable error, aborting:', msg)
-            break
+            console.warn('[reports/generate] %s returned %d, trying next key', candidate.provider, status)
+            continue
+          }
+
+          // 429 / 5xx / network — backoff and try next
+          if (i < MAX_ATTEMPTS - 1) {
+            const wait = status === 429 ? 1500 : 800
+            await sleep(wait)
           }
         }
       }
@@ -348,11 +348,11 @@ export async function POST(req: NextRequest) {
     }
 
     if (!rawContent) {
-      const detail = generationErrors.slice(0, 3).join(' | ')
-      console.error('[reports/generate] all candidates failed:', generationErrors.join(' | '))
+      const detail = lastErrors.join(' | ')
+      console.error('[reports/generate] all attempts failed:', detail)
       return NextResponse.json(
         {
-          error: 'The AI provider could not generate your report. Please check your GROQ_API_KEY is valid and try again.',
+          error: 'Could not generate report. The AI provider returned errors on all attempts.',
           details: detail,
         },
         { status: 502 }
@@ -365,13 +365,12 @@ export async function POST(req: NextRequest) {
       console.error(
         '[reports/generate] AI did not return valid JSON:',
         parsed.error,
-        '| raw[0..200]:',
-        rawContent.slice(0, 200)
+        '| raw[0..300]:',
+        rawContent.slice(0, 300)
       )
       return NextResponse.json(
         {
-          error:
-            'The AI returned an invalid response. Please try again — if it keeps failing, the model may be rate-limited.',
+          error: 'The AI returned an invalid response format. Please try again.',
           details: parsed.error,
         },
         { status: 502 }
@@ -398,7 +397,7 @@ export async function POST(req: NextRequest) {
       generated_at: meta.generated_at || new Date().toISOString(),
     }
 
-    // ── Save report to database ──────────────────────────────────
+    // ── Save to database ─────────────────────────────────────────
     const { data: saved, error: dbError } = await supabase
       .from('business_reports')
       .insert({
@@ -414,7 +413,7 @@ export async function POST(req: NextRequest) {
       .single()
 
     if (dbError) {
-      console.error('[reports/generate] supabase insert failed:', dbError)
+      console.error('[reports/generate] DB insert failed:', dbError)
       return NextResponse.json(
         { error: 'Report generated but could not be saved. Try again.' },
         { status: 500 }
@@ -422,7 +421,7 @@ export async function POST(req: NextRequest) {
     }
 
     // ── Post-save telemetry (best-effort) ────────────────────────
-    const sideEffects = await Promise.allSettled([
+    await Promise.allSettled([
       supabase.from('daily_usage').upsert(
         { user_id: user.id, feature: 'report', date: today, count: currentCount + 1 },
         { onConflict: 'user_id,feature,date' }
@@ -439,21 +438,15 @@ export async function POST(req: NextRequest) {
         metadata: { report_id: saved.id },
       }),
     ])
-    sideEffects.forEach((res, i) => {
-      if (res.status === 'rejected') {
-        console.error('[reports/generate] side effect %d failed:', i, res.reason)
-      }
-    })
 
     return NextResponse.json({ success: true, reportId: saved.id })
   } catch (err) {
     console.error('[reports/generate] unhandled error:', err)
     const message = err instanceof Error ? err.message : 'Unknown error'
-    const safeMessage = message.length > 300 ? message.slice(0, 300) + '…' : message
     return NextResponse.json(
       {
         error: 'Could not generate report. Please try again.',
-        details: safeMessage,
+        details: message.length > 300 ? message.slice(0, 300) + '…' : message,
       },
       { status: 500 }
     )
