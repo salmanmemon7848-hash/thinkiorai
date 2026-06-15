@@ -148,7 +148,24 @@ export async function POST(req: NextRequest) {
     }
 
     const queries = buildReportSearchQueries(input)
-    const research = await researchForReport(queries)
+    // Run all research topics in parallel but cap the total wall-clock
+    // time so we never blow past Vercel's function timeout. The
+    // Vercel function is configured for 60s on Pro; we leave 20s of
+    // headroom for the Groq completion + DB write + buffer.
+    // On Hobby (10s cap) the route will still finish research, fail
+    // at the Groq step, and return a 502 — that path now shows a
+    // clean error in the UI instead of the gateway HTML.
+    const RESEARCH_BUDGET_MS = 35_000
+    const researchPromise = researchForReport(queries)
+    const research = await Promise.race([
+      researchPromise,
+      new Promise<Record<string, unknown>>((_, reject) =>
+        setTimeout(
+          () => reject(new Error('Research budget exceeded')),
+          RESEARCH_BUDGET_MS
+        )
+      ),
+    ]) as Awaited<ReturnType<typeof researchForReport>>
     const searchContext = Object.entries(research)
       .map(([topic, data]) =>
         `\n## Research: ${topic}\n${data.synthesis}\n\nKey Findings:\n${data.key_findings.join('\n')}\n\nData Points:\n${data.data_points.join('\n')}\n\nMarket Data: ${data.market_data.india_market_size} | Growth: ${data.market_data.growth_rate} | Players: ${data.market_data.key_players_india.join(', ')}`
