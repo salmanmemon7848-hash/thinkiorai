@@ -35,6 +35,7 @@ import {
   ChevronRight,
 } from 'lucide-react'
 import { cn } from '@/lib/utils/cn'
+import { safeFetchJson } from '@/lib/utils/safeFetch'
 import {
   REPORT_TEMPLATES,
   getDefaultTemplate,
@@ -117,13 +118,17 @@ export default function ReportWizard() {
     }, 3500)
 
     try {
-      const res = await fetch('/api/reports/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ input: form }),
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.message || data.error || 'Generation failed')
+      const data = await safeFetchJson<{ reportId?: string; error?: string; message?: string }>(
+        '/api/reports/generate',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ input: form }),
+        }
+      )
+      if (!data.reportId) {
+        throw new Error(data.message || data.error || 'Generation failed')
+      }
       clearInterval(ticker)
       router.push(`/reports/${data.reportId}`)
     } catch (err) {

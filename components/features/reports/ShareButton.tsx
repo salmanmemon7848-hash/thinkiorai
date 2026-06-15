@@ -21,6 +21,7 @@ import {
   ExternalLink,
 } from 'lucide-react'
 import { cn } from '@/lib/utils/cn'
+import { safeFetchJson } from '@/lib/utils/safeFetch'
 
 interface ShareButtonProps {
   reportId: string
@@ -58,11 +59,11 @@ export default function ShareButton({
         setEnabled(false)
         setOpen(false)
       } else {
-        const res = await fetch(`/api/reports/${reportId}/share`, {
-          method: 'POST',
-        })
-        const data = await res.json()
-        if (!res.ok) throw new Error(data.error || 'Could not enable sharing')
+        const data = await safeFetchJson<{ shareSlug?: string; error?: string }>(
+          `/api/reports/${reportId}/share`,
+          { method: 'POST' }
+        )
+        if (!data.shareSlug) throw new Error(data.error || 'Could not enable sharing')
         setEnabled(true)
         setSlug(data.shareSlug)
       }
