@@ -34,7 +34,7 @@ export default function TermsPage() {
         <ul>
           <li>Business idea validation (GO / KILL / PIVOT verdicts)</li>
           <li>Competitor research and intelligence (Builder plan and above)</li>
-          <li>Pitch evaluation and feedback</li>
+          <li>Public-source lead research and outreach drafting</li>
           <li>Idea generation sessions</li>
           <li>AI chat with business context (Co-founder Desk)</li>
           <li>Structured business reports with PDF export (Founder Pro plan only)</li>

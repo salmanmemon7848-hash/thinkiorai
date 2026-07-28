@@ -3,7 +3,7 @@ import {
   Search,
   Lightbulb,
   MessageSquare,
-  Presentation,
+  UsersRound,
   ArrowRight,
   TrendingUp,
   TrendingDown,
@@ -43,7 +43,7 @@ export default function FeaturesSection() {
           {/* Row 2: Reports (4) + Ideas (4) + Pitch (4) */}
           <FeatureCardReports />
           <FeatureCardIdeas />
-          <FeatureCardPitch />
+          <FeatureCardLeads />
 
           {/* Row 3: Chat — full-width */}
           <FeatureCardChat />
@@ -205,21 +205,21 @@ function FeatureCardIdeas() {
   )
 }
 
-/* === Pitch === */
-function FeatureCardPitch() {
+/* === Leads Finder === */
+function FeatureCardLeads() {
   return (
     <Link
       href="/signup"
       className="md:col-span-4 group card-premium rounded-2xl p-7 md:p-8 hover:bg-bg-elevated transition-all duration-500"
     >
       <div className="flex items-center gap-3 mb-6">
-        <div className="w-9 h-9 rounded-lg bg-signal-violet/15 border border-signal-violet/30 flex items-center justify-center">
-          <Presentation className="w-4 h-4 text-signal-violet" />
+        <div className="w-9 h-9 rounded-lg bg-accent/15 border border-accent/30 flex items-center justify-center">
+          <UsersRound className="w-4 h-4 text-accent" />
         </div>
-        <span className="eyebrow">Pitch Evaluator</span>
+        <span className="eyebrow">Leads Finder</span>
       </div>
       <h3 className="font-display font-bold text-2xl text-fg tracking-tight leading-[1.1] mb-4">
-        Know what kills your raise.
+        Find the next people worth talking to.
       </h3>
       <p className="text-[14px] text-fg-dim leading-relaxed mb-7">
         Score your pitch like a YC partner × Blume VC. Seven sections, the two
@@ -228,17 +228,15 @@ function FeatureCardPitch() {
 
       <div className="bg-bg-sub border border-line rounded-lg p-4 mb-6">
         <div className="flex items-baseline justify-between mb-3">
-          <span className="font-mono text-[10px] uppercase tracking-caps text-fg-muted">Fundability</span>
-          <span className="font-mono text-xs text-fg-muted">/10</span>
+          <span className="font-mono text-[10px] uppercase tracking-caps text-fg-muted">Research result</span>
+          <span className="font-mono text-xs text-accent">Sources visible</span>
         </div>
-        <div className="font-display font-bold text-3xl text-fg mb-3 tabular">7.4</div>
-        <div className="h-1.5 bg-bg rounded-full overflow-hidden">
-          <div className="h-full bg-gradient-to-r from-signal-violet to-accent rounded-full" style={{ width: '74%' }} />
-        </div>
+        <div className="font-display font-bold text-3xl text-fg mb-1 tabular">10</div>
+        <p className="text-xs text-fg-muted">requested leads, with public evidence</p>
       </div>
 
-      <div className="flex items-center gap-2 text-signal-violet font-medium text-sm group-hover:gap-3 transition-all">
-        Try Pitch Evaluator
+      <div className="flex items-center gap-2 text-accent font-medium text-sm group-hover:gap-3 transition-all">
+        Try Leads Finder
         <ArrowRight className="w-4 h-4" />
       </div>
     </Link>

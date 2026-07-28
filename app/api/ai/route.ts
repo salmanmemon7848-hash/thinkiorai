@@ -5,7 +5,6 @@ import { sanitizeMessages, sanitizeFeature } from '@/lib/utils/sanitize'
 import { getValidatorPrompt } from '@/lib/ai/prompts/validator'
 import { getCompetitorPrompt } from '@/lib/ai/prompts/competitor'
 import { getIdeasPrompt } from '@/lib/ai/prompts/ideas'
-import { getPitchPrompt } from '@/lib/ai/prompts/pitch'
 import { getChatPrompt } from '@/lib/ai/prompts/chat'
 import { getFounderContextBlock } from '@/lib/ai/prompts/masterPrompts'
 import { PLAN_LIMITS, PLAN_GATED_FEATURES, PLAN_NAMES } from '@/lib/constants'
@@ -22,7 +21,6 @@ const FEATURE_LABEL: Record<string, string> = {
   validator: 'Business Validator',
   competitor: 'Competitor Research',
   ideas: 'Business Ideas',
-  pitch: 'Pitch Evaluator',
   chat: 'AI Chat',
   report: 'Business Reports',
 }
@@ -31,7 +29,6 @@ const COMPLEXITY: Record<string, 'simple' | 'complex'> = {
   validator: 'complex',
   competitor: 'complex',
   ideas: 'complex',
-  pitch: 'complex',
   chat: 'simple',
 }
 
@@ -43,8 +40,6 @@ function getSystemPrompt(feature: string, lastUserMessage: string): string {
       return getCompetitorPrompt(lastUserMessage)
     case 'ideas':
       return getIdeasPrompt(lastUserMessage)
-    case 'pitch':
-      return getPitchPrompt(lastUserMessage)
     case 'chat':
     default:
       return getChatPrompt(lastUserMessage)
@@ -53,7 +48,7 @@ function getSystemPrompt(feature: string, lastUserMessage: string): string {
 
 /**
  * Extract the structured `THINKIOR_CARD` block from a chat response
- * and validate it. Validator, Competitor, Pitch, and Ideas produce
+ * and validate it. Validator, Competitor, and Ideas produce
  * cards. Other features will be wired up in later phases.
  */
 function extractCardForFeature(feature: string, text: string): unknown | null {
@@ -62,9 +57,6 @@ function extractCardForFeature(feature: string, text: string): unknown | null {
   }
   if (feature === 'competitor') {
     return parseThinkiorCard(text, 'competitor').card ?? null
-  }
-  if (feature === 'pitch') {
-    return parseThinkiorCard(text, 'pitch').card ?? null
   }
   if (feature === 'ideas') {
     return parseThinkiorCard(text, 'ideas').card ?? null
@@ -92,11 +84,6 @@ function extractScoreAndVerdict(text: string): {
   const scoreMatch = text.match(/Score:\s*(\d+\.?\d*)\/10/i)
   if (scoreMatch) score = parseFloat(scoreMatch[1])
 
-  // Also check "Fundability Score: X.X/10" for pitch evaluator
-  if (!score) {
-    const fundMatch = text.match(/Fundability Score:\s*(\d+\.?\d*)\/10/i)
-    if (fundMatch) score = parseFloat(fundMatch[1])
-  }
 
   // Generate a summary from the first meaningful line after verdict
   let summary: string | null = null
@@ -332,7 +319,6 @@ export async function POST(req: NextRequest) {
       cardKind:
         feature === 'validator' ||
         feature === 'competitor' ||
-        feature === 'pitch' ||
         feature === 'ideas'
           ? feature
           : null,

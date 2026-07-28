@@ -39,7 +39,7 @@ const FAQS = [
   },
   {
     q: 'Is this only for first-time founders?',
-    a: 'No. Thinkior is useful at every stage from "I have an idea" to "I\'m raising a Series A." First-time founders use it to validate before building. Experienced founders use it for competitor intelligence, pitch prep, and full business reports.',
+    a: 'No. Thinkior is useful from first idea through first revenue. First-time founders use it to validate before building. Experienced founders use it for competitor intelligence, lead research, and practical business reports.',
   },
 ]
 

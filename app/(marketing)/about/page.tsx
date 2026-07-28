@@ -15,7 +15,7 @@ const TOOLS = [
   'Business Validator',
   'Competitor Intel',
   'Ideas Desk',
-  'Pitch Evaluator',
+  'Leads Finder',
   'Co-founder Desk',
 ]
 
@@ -87,7 +87,7 @@ export default function AboutPage() {
             <p>
               I taught myself to build using a mix of self-learning and AI tools. Within
               a few weeks, Thinkior AI was live — with a Business Validator, Competitor
-              Intel engine, Pitch Evaluator, Ideas Desk, and a Co-founder Desk available
+              Intel engine, Leads Finder, Ideas Desk, and a Co-founder Desk available
               24/7 in Hindi, Hinglish, or English. No co-founder. No funding. No office.
               Just a Class 12th student with a laptop in Chhattisgarh.
             </p>

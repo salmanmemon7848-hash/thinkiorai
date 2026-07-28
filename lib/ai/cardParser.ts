@@ -19,11 +19,10 @@ import {
   ValidatorCardSchema,
   ValidatorPreviewSchema,
   CompetitorCardSchema,
-  PitchCardSchema,
   IdeasCardSchema,
 } from './cardSchemas'
 
-export type CardKind = 'validator' | 'preview' | 'competitor' | 'pitch' | 'ideas'
+export type CardKind = 'validator' | 'preview' | 'competitor' | 'ideas'
 
 export interface ParsedMessage<T = unknown> {
   /** The original text, with the structured block removed. */
@@ -42,7 +41,6 @@ const SCHEMAS: Record<CardKind, ZodTypeAny> = {
   validator: ValidatorCardSchema,
   preview: ValidatorPreviewSchema,
   competitor: CompetitorCardSchema,
-  pitch: PitchCardSchema,
   ideas: IdeasCardSchema,
 }
 

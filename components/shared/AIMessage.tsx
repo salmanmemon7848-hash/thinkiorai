@@ -7,12 +7,10 @@ import {
   ValidatorCardSchema,
   ValidatorPreviewSchema,
   CompetitorCardSchema,
-  PitchCardSchema,
   IdeasCardSchema,
 } from '@/lib/ai/cardSchemas'
 import ValidatorCardView from '@/components/features/validator/ValidatorCard'
 import CompetitorCardView from '@/components/features/competitor/CompetitorCard'
-import PitchCardView from '@/components/features/pitch/PitchCard'
 import IdeasCardView from '@/components/features/ideas/IdeasCard'
 import type { ResearchSource } from '@/types'
 
@@ -55,8 +53,8 @@ export default function AIMessage({ content, className, card, cardKind, sources 
 
   if (!resolvedCard) {
     const order: CardKind[] = cardKind
-      ? [cardKind, 'validator', 'competitor', 'pitch', 'ideas', 'preview']
-      : ['validator', 'competitor', 'pitch', 'ideas', 'preview']
+      ? [cardKind, 'validator', 'competitor', 'ideas', 'preview']
+      : ['validator', 'competitor', 'ideas', 'preview']
     for (const k of order) {
       const parsed = parseThinkiorCard(content, k)
       if (parsed.card) {
@@ -88,17 +86,9 @@ export default function AIMessage({ content, className, card, cardKind, sources 
     CompetitorCardSchema.safeParse(resolvedCard).success
       ? CompetitorCardSchema.parse(resolvedCard)
       : null
-  const pitchCard =
-    !validatorCard &&
-    !competitorCard &&
-    resolvedCard &&
-    PitchCardSchema.safeParse(resolvedCard).success
-      ? PitchCardSchema.parse(resolvedCard)
-      : null
   const ideasCard =
     !validatorCard &&
     !competitorCard &&
-    !pitchCard &&
     resolvedCard &&
     IdeasCardSchema.safeParse(resolvedCard).success
       ? IdeasCardSchema.parse(resolvedCard)
@@ -106,7 +96,6 @@ export default function AIMessage({ content, className, card, cardKind, sources 
   const previewCard =
     !validatorCard &&
     !competitorCard &&
-    !pitchCard &&
     !ideasCard &&
     resolvedCard &&
     ValidatorPreviewSchema.safeParse(resolvedCard).success
@@ -135,11 +124,6 @@ export default function AIMessage({ content, className, card, cardKind, sources 
           <CompetitorCardView card={competitorCard} />
         </div>
       )}
-      {pitchCard && (
-        <div className="sm:pl-10">
-          <PitchCardView card={pitchCard} />
-        </div>
-      )}
       {ideasCard && (
         <div className="sm:pl-10">
           <IdeasCardView card={ideasCard} />
@@ -162,7 +146,7 @@ export default function AIMessage({ content, className, card, cardKind, sources 
         </div>
       )}
       {/* Preview card is rendered inline by FastPreview, not here. */}
-      {previewCard && !validatorCard && !competitorCard && !pitchCard && !ideasCard && null}
+      {previewCard && !validatorCard && !competitorCard && !ideasCard && null}
 
       {void resolvedKind}
     </div>

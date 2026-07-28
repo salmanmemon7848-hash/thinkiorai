@@ -23,6 +23,20 @@ export async function GET(req: NextRequest) {
   const plan = effectivePlan(profile)
 
   if (feature) {
+    if (feature === 'leads' && plan === 'free') {
+      const { count } = await supabase
+        .from('founder_lead_searches')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+      const used = count ?? 0
+      return NextResponse.json({
+        count: Math.min(used, 1),
+        limit: 1,
+        remaining: used > 0 ? 0 : 1,
+        exceeded: used > 0,
+        period: 'lifetime',
+      })
+    }
     const today = new Date().toISOString().split('T')[0]
     const { data } = await supabase
       .from('daily_usage')
@@ -39,6 +53,7 @@ export async function GET(req: NextRequest) {
       limit,
       remaining: Math.max(0, limit - count),
       exceeded: count >= limit,
+      period: 'daily',
     })
   }
 

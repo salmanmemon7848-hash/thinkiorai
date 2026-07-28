@@ -42,7 +42,7 @@ export const metadata: Metadata = {
     'Indian startup',
     'business validator',
     'competitor analysis',
-    'pitch evaluation',
+    'lead finder',
     'startup India',
     'founder tools',
     'business intelligence',

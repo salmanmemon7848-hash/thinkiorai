@@ -142,7 +142,7 @@ export async function POST(req: NextRequest) {
 
     // ── AI generation — use the EXACT same aiHandler as all other ─
     // features. This is the same code path that powers validator,
-    // competitor, ideas, pitch, and chat. If those work, this works.
+    // competitor, ideas, leads, and chat. If those work, this works.
     const systemPrompt = getReportSystemPrompt(input)
     const userPrompt = buildReportUserPrompt(input, searchContext)
 

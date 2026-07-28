@@ -20,7 +20,7 @@ import {
   CheckCircle2,
   Search,
   Lightbulb,
-  Presentation,
+  Target,
   FileText,
   MessageSquare,
   Sparkles,
@@ -35,7 +35,7 @@ const ICON: Record<string, typeof CheckCircle2> = {
   validator: CheckCircle2,
   competitor: Search,
   ideas: Lightbulb,
-  pitch: Presentation,
+  leads: Target,
   report: FileText,
   chat: MessageSquare,
 }
@@ -44,7 +44,7 @@ const ACCENT: Record<string, string> = {
   validator: 'text-accent',
   competitor: 'text-signal-insight',
   ideas: 'text-signal-pivot',
-  pitch: 'text-signal-violet',
+  leads: 'text-accent',
   report: 'text-accent',
   chat: 'text-fg-dim',
 }
@@ -151,7 +151,7 @@ function EmptyState() {
           Your founder timeline starts here
         </h3>
         <p className="text-[13px] text-fg-dim leading-relaxed mb-5">
-          Run any tool — Validator, Competitor, Pitch, Ideas — and your work
+          Run any tool — Validator, Competitor, Leads Finder, Ideas — and your work
           will appear here. Each entry shows the verdict, the score, or the
           headline result.
         </p>

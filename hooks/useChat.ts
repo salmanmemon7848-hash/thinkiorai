@@ -9,7 +9,7 @@ import type { ChatMessage, Feature, ResearchSource } from '@/types'
  */
 export interface ChatMessageWithCard extends ChatMessage {
   card?: unknown | null
-  cardKind?: 'validator' | 'preview' | 'competitor' | 'pitch' | 'ideas' | null
+  cardKind?: 'validator' | 'preview' | 'competitor' | 'ideas' | null
 }
 
 export function useChat(feature: Feature) {

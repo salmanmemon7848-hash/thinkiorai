@@ -26,7 +26,6 @@ import {
   Target,
   Compass,
   Rocket,
-  TrendingUp,
   Calendar,
 } from 'lucide-react'
 import { cn } from '@/lib/utils/cn'
@@ -123,13 +122,13 @@ function LatestResult({
   const moduleLabel: Record<string, string> = {
     validator: 'Validator',
     competitor: 'Competitor',
-    pitch: 'Pitch',
+    leads: 'Leads Finder',
     ideas: 'Ideas',
     report: 'Report',
   }
   const Icon = (() => {
     if (latest.module === 'validator') return tone === 'kill' ? AlertTriangle : tone === 'pivot' ? RotateCw : CheckCircle2
-    if (latest.module === 'pitch') return TrendingUp
+    if (latest.module === 'leads') return Target
     if (latest.module === 'competitor') return Target
     if (latest.module === 'ideas') return Lightbulb
     return Sparkles

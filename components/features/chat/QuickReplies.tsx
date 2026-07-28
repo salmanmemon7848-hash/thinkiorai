@@ -79,9 +79,9 @@ export default function QuickReplies({ sessions, onPick }: QuickRepliesProps) {
     }
   }
 
-  const lastPitch = sessions.find((s) => s.module === 'pitch')
-  if (lastPitch) {
-    push('Rewrite the weakest slide from my last Pitch Evaluator.')
+  const lastLeads = sessions.find((s) => s.module === 'leads')
+  if (lastLeads) {
+    push('Help me prepare for the next conversation from my saved leads.')
   }
 
   const lastCompetitor = sessions.find((s) => s.module === 'competitor')

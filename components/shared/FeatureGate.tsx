@@ -16,7 +16,7 @@ const UPGRADE_HINTS: Record<Feature, string> = {
   validator: 'Score every idea you have with India-first market research.',
   competitor: 'Map the battlefield — Indian competitors, pricing, positioning.',
   ideas: 'Generate India-relevant business ideas in any sector.',
-  pitch: 'Get a fundability score on your deck before investors see it.',
+  leads: 'Find source-backed customer and investor leads worth talking to.',
   chat: 'Your always-on co-founder who knows your business.',
   report: 'Investor-grade reports backed by live market research.',
 }

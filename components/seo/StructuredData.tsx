@@ -6,7 +6,7 @@ export default function StructuredData() {
     url: 'https://www.thinkiorai.com',
     logo: 'https://www.thinkiorai.com/icon.svg',
     description:
-      'AI co-founder platform built for early-stage Indian startup founders. Provides business validation, competitor intelligence, pitch evaluation, and investor-grade business reports.',
+      'AI co-founder platform for global startup founders. Provides business validation, competitor intelligence, source-backed lead research, and practical business reports.',
     foundingDate: '2025',
     founder: {
       '@type': 'Person',
@@ -41,7 +41,7 @@ export default function StructuredData() {
     operatingSystem: 'Web',
     url: 'https://www.thinkiorai.com',
     description:
-      'AI co-founder for Indian startup founders. Validates ideas, maps Indian competitors, sizes markets in ₹, evaluates pitches, and generates investor-grade business reports.',
+      'AI co-founder for global startup founders. Validates ideas, maps competitors, finds source-backed leads, and generates practical business reports.',
     offers: [
       {
         '@type': 'Offer',
@@ -72,7 +72,7 @@ export default function StructuredData() {
       'Business Validation with GO / KILL / PIVOT verdicts',
       'Indian Competitor Intelligence',
       'Idea Generation Desk',
-      'Pitch Deck Evaluator',
+      'Leads Finder',
       'Co-founder Desk AI Chat (24/7)',
       'Investor-grade Business Reports (PDF export)',
       'Hindi, Hinglish, and English support',

@@ -23,7 +23,7 @@ import {
   Rocket,
   Search,
   Lightbulb,
-  Presentation,
+  UsersRound,
   MessageSquare,
   ChevronDown,
   ChevronUp,
@@ -45,7 +45,7 @@ const MODULE_ICON: Record<string, React.ElementType> = {
   validator: CheckCircle2,
   competitor: Search,
   ideas: Lightbulb,
-  pitch: Presentation,
+  leads: UsersRound,
   chat: MessageSquare,
   report: Sparkles,
 }
@@ -53,7 +53,7 @@ const MODULE_LABEL: Record<string, string> = {
   validator: 'Validator',
   competitor: 'Competitor',
   ideas: 'Ideas',
-  pitch: 'Pitch',
+  leads: 'Leads Finder',
   chat: 'Chat',
   report: 'Report',
 }

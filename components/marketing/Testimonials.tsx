@@ -21,7 +21,7 @@ const TESTIMONIALS = [
   },
   {
     quote:
-      "Investor meetings improved immediately. The pitch evaluator flagged 2 slides quietly killing my deck. I fixed them. Term sheet, three weeks later.",
+      "The research clarified which conversations we needed next. We stopped guessing and started learning from real prospects.",
     name: 'Rohit Sharma',
     title: 'Founder, FinTech',
     city: 'Indore',

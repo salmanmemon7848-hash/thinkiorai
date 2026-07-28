@@ -4,7 +4,7 @@ export type Feature =
   | 'validator'
   | 'competitor'
   | 'ideas'
-  | 'pitch'
+  | 'leads'
   | 'chat'
   | 'report'
 
@@ -23,7 +23,7 @@ export interface PlanLimits {
   validator: number
   competitor: number
   ideas: number
-  pitch: number
+  leads: number
   chat: number
   report: number
 }
@@ -111,6 +111,40 @@ export interface FounderExperiment {
   status: 'planned' | 'running' | 'complete' | 'stopped'
   outcome: string | null
   created_at: string
+}
+
+export type LeadType = 'customer' | 'investor'
+export type LeadStage = 'saved' | 'contacted' | 'replied' | 'not_a_fit'
+export type LeadConfidence = 'source_backed' | 'ai_inferred'
+
+export interface LeadEvidence {
+  title: string
+  url: string
+  fact: string
+  sourceDate: string | null
+  retrievedAt: string
+}
+
+export interface LeadCandidate {
+  name: string
+  website: string | null
+  location: string | null
+  fit: string
+  confidence: LeadConfidence
+  contactPath: string
+  contactUrl: string | null
+  evidence: LeadEvidence[]
+}
+
+export interface FounderLead extends LeadCandidate {
+  id: string
+  search_id: string | null
+  lead_type: LeadType
+  stage: LeadStage
+  notes: string | null
+  follow_up_at: string | null
+  created_at: string
+  updated_at: string
 }
 
 export interface AIRequest {

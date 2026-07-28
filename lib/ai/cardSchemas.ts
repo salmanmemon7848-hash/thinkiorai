@@ -107,39 +107,6 @@ export type CompetitorCard = z.infer<typeof CompetitorCardSchema>
 
 // ── Pitch Card (investor-grade scorecard) ──────────────────────
 
-export const PitchScoresSchema = z.object({
-  problem: z.number().int().min(0).max(100),
-  solution: z.number().int().min(0).max(100),
-  market_size: z.number().int().min(0).max(100),
-  traction: z.number().int().min(0).max(100),
-  business_model: z.number().int().min(0).max(100),
-  team: z.number().int().min(0).max(100),
-  ask: z.number().int().min(0).max(100),
-})
-export type PitchScores = z.infer<typeof PitchScoresSchema>
-
-export const PitchWeakestSlideSchema = z.object({
-  topic: z.string().max(80).default(''),
-  issue: z.string().max(240).default(''),
-  rewrite: z.string().max(500).default(''),
-})
-export type PitchWeakestSlide = z.infer<typeof PitchWeakestSlideSchema>
-
-export const PitchCardSchema = z.object({
-  score: z.number().int().min(0).max(100),
-  tier: z.enum(['not_ready', 'pre_seed', 'angel', 'seed']),
-  headline: z.string().max(160).default(''),
-  scores: PitchScoresSchema,
-  strongest: z.string().max(240).default(''),
-  red_flag: z.string().max(240).default(''),
-  weakest_slide: PitchWeakestSlideSchema,
-  investor_think: z.string().max(280).default(''),
-  kill_your_raise: z.string().max(240).default(''),
-  fix_in_10_min: z.string().max(240).default(''),
-  what_investor_wants: z.string().max(280).default(''),
-})
-export type PitchCard = z.infer<typeof PitchCardSchema>
-
 // ── Ideas Card (5-question flow OR specific plan + decision) ───
 
 export const IdeasQuestionSchema = z.object({

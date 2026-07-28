@@ -5,7 +5,7 @@ export const PLAN_LIMITS: Record<Plan, PlanLimits> = {
     validator: 1,    // 1 free Business Validation / day
     competitor: 1,   // 1 free Competitor Intel run / day
     ideas: 1,        // 1 free Ideas session / day
-    pitch: 1,        // 1 free Pitch Evaluation / day
+    leads: 1,        // One Lead Finder preview for the account lifetime
     chat: 5,         // 5 AI Chat messages / day
     report: 0,       // Locked — Founder Pro only
   },
@@ -13,7 +13,7 @@ export const PLAN_LIMITS: Record<Plan, PlanLimits> = {
     validator: 5,    // 5 Business Validations / day
     competitor: 5,   // 5 Competitor Research / day
     ideas: 5,        // 5 Ideas sessions / day
-    pitch: 5,        // 5 Pitch Evaluations / day
+    leads: 5,        // 5 Lead Finder searches / day
     chat: 10,        // 10 AI Chat messages / day
     report: 0,       // Locked — Founder Pro only
   },
@@ -21,7 +21,7 @@ export const PLAN_LIMITS: Record<Plan, PlanLimits> = {
     validator: 10,   // 10 Business Validations / day
     competitor: 10,  // 10 Competitor Research / day
     ideas: 10,       // 10 Ideas sessions / day
-    pitch: 10,       // 10 Pitch Evaluations / day
+    leads: 10,       // 10 Lead Finder searches / day
     chat: 15,        // 15 AI Chat messages / day
     report: 3,       // 3 Business Reports / day
   },
@@ -56,7 +56,7 @@ export const FEATURE_NAMES: Record<string, string> = {
   validator: 'Business Validator',
   competitor: 'Competitor Research',
   ideas: 'Business Ideas',
-  pitch: 'Pitch Deck Evaluator',
+  leads: 'Leads Finder',
   chat: 'AI Chat',
   report: 'Business Report',
 }

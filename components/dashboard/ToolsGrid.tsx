@@ -16,7 +16,7 @@ import {
   CheckCircle2,
   Search,
   Lightbulb,
-  Presentation,
+  Target,
   FileText,
   MessageSquare,
   Sparkles,
@@ -29,7 +29,7 @@ const ICON_MAP: Record<ToolIconKey, typeof CheckCircle2> = {
   validator: CheckCircle2,
   competitor: Search,
   ideas: Lightbulb,
-  pitch: Presentation,
+  leads: Target,
   reports: FileText,
   chat: MessageSquare,
 }

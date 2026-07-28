@@ -8,6 +8,7 @@ interface UsageData {
   limit: number
   remaining: number
   exceeded: boolean
+  period?: 'daily' | 'lifetime'
 }
 
 export function useUsage(feature: Feature) {
