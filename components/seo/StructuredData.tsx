@@ -3,8 +3,8 @@ export default function StructuredData() {
     '@context': 'https://schema.org',
     '@type': 'Organization',
     name: 'Thinkior AI',
-    url: 'https://thinkiorai.com',
-    logo: 'https://thinkiorai.com/icon.svg',
+    url: 'https://www.thinkiorai.com',
+    logo: 'https://www.thinkiorai.com/icon.svg',
     description:
       'AI co-founder platform built for early-stage Indian startup founders. Provides business validation, competitor intelligence, pitch evaluation, and investor-grade business reports.',
     foundingDate: '2025',
@@ -39,7 +39,7 @@ export default function StructuredData() {
     applicationCategory: 'BusinessApplication',
     applicationSubCategory: 'Startup Intelligence Platform',
     operatingSystem: 'Web',
-    url: 'https://thinkiorai.com',
+    url: 'https://www.thinkiorai.com',
     description:
       'AI co-founder for Indian startup founders. Validates ideas, maps Indian competitors, sizes markets in ₹, evaluates pitches, and generates investor-grade business reports.',
     offers: [

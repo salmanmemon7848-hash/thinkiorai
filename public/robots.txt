@@ -7,4 +7,4 @@ Disallow: /api/
 Disallow: /onboarding
 
 # Sitemap
-Sitemap: https://thinkiorai.com/sitemap.xml
+Sitemap: https://www.thinkiorai.com/sitemap.xml

@@ -21,6 +21,7 @@ import { checkRateLimit, acquireSlot, releaseSlot } from '@/lib/rateLimit'
 import { parseThinkiorCard } from '@/lib/ai/cardParser'
 import { PitchCardSchema } from '@/lib/ai/cardSchemas'
 import type { Plan, Feature } from '@/types'
+import { effectivePlan } from '@/lib/plan'
 
 // pdf-parse is a CJS module — dynamic import keeps the Edge bundle
 // (if any) clean and lets us handle the import failure gracefully.
@@ -53,10 +54,10 @@ export async function POST(req: NextRequest) {
     // ── Plan + quota ──────────────────────────────────────────
     const { data: profile } = await supabase
       .from('profiles')
-      .select('plan')
+      .select('plan, plan_expires_at')
       .eq('id', user.id)
       .single()
-    const plan = (profile?.plan ?? 'free') as Plan
+    const plan = effectivePlan(profile)
 
     const rateCheck = await checkRateLimit(user.id, plan, supabase)
     if (!rateCheck.allowed) {

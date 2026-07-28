@@ -13,6 +13,7 @@ import { checkRateLimit, acquireSlot, releaseSlot, incrementGlobalDaily } from '
 import { sanitizeString } from '@/lib/utils/sanitize'
 import { safeParseJson } from '@/lib/ai/jsonRepair'
 import type { Plan } from '@/types'
+import { effectivePlan } from '@/lib/plan'
 
 export const maxDuration = 60
 
@@ -64,11 +65,11 @@ export async function POST(req: NextRequest) {
 
     const { data: profile } = await supabase
       .from('profiles')
-      .select('plan')
+      .select('plan, plan_expires_at')
       .eq('id', user.id)
       .single()
 
-    const plan = (profile?.plan ?? 'free') as Plan
+    const plan = effectivePlan(profile)
 
     // ── Plan-gate: Business Reports require Founder Pro ─────────
     const requiredPlan = PLAN_GATED_FEATURES.report

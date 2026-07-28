@@ -26,14 +26,11 @@ export default function FeaturesSection() {
         <div className="max-w-3xl mb-14 md:mb-20">
           <p className="eyebrow mb-4">The product</p>
           <h2 className="font-display font-bold text-4xl md:text-5xl lg:text-6xl text-fg tracking-tighter leading-[1.02]">
-            Six tools.{' '}
-            <span className="font-serif-italic font-normal text-accent">
-              One AI co-founder.
-            </span>
+            A guided journey.{' '}
+            <span className="font-serif-italic font-normal text-accent">One clear next move.</span>
           </h2>
           <p className="text-lg text-fg-dim mt-6 max-w-2xl leading-relaxed">
-            Each tool answers one specific question a founder asks at 11pm.
-            Built with brutal specificity for the Indian market — not adapted from Silicon Valley.
+            Start with the question in front of you, then carry the evidence and learning into the next decision.
           </p>
         </div>
 
@@ -81,9 +78,8 @@ function FeatureCardLarge() {
       </h3>
 
       <p className="text-[15px] text-fg-dim leading-relaxed mb-8 max-w-md">
-        Not vague feedback. A real verdict — with Indian TAM/SAM/SOM in ₹,
-        regulatory red flags, unit economics at ₹299 price points, and the one
-        action you should take this week.
+        Not vague feedback. A transparent decision framework with assumptions to test,
+        evidence to gather, and one action to take this week.
       </p>
 
       {/* Mini preview */}
@@ -135,8 +131,8 @@ function FeatureCardCompetitor() {
         Map the battlefield before you enter.
       </h3>
       <p className="text-[14px] text-fg-dim leading-relaxed mb-7">
-        Find Indian competitors nobody else is tracking. Extract their weaknesses
-        from real reviews. Spot the white space they&apos;re missing.
+        Research the market, collect source-backed competitor evidence, and spot the
+        assumptions you need to verify before you enter.
       </p>
 
       {/* Mini chart preview */}
@@ -326,9 +322,8 @@ function FeatureCardChat() {
             Your co-founder. Available 24/7. <span className="font-serif-italic font-normal text-fg-dim">On tap.</span>
           </h3>
           <p className="text-[15px] text-fg-dim leading-relaxed mb-7 max-w-md">
-            Strategy. Fundraising. Operations. GTM. Deep Indian context —
-            no generic advice. Speaks Hindi, Hinglish, or English. Has read
-            your reports and remembers your last conversation.
+            Strategy, validation, fundraising, and GTM guidance grounded in your
+            saved context. Ask for a clear next decision, not generic advice.
           </p>
           <div className="flex items-center gap-2 text-fg font-medium text-sm group-hover:gap-3 transition-all">
             Try Co-founder Desk
@@ -343,12 +338,11 @@ function FeatureCardChat() {
           </div>
           <div className="bg-bg-sub border border-line rounded-2xl rounded-tl-md px-4 py-3 text-[13px] text-fg-dim max-w-[90%]">
             <p className="leading-relaxed">
-              With ₹12L MRR and 18% MoM growth — bootstrap 6 more months.
-              Raise on traction, not story. You&apos;ll get 1.5–2x the valuation
-              at ₹30L MRR.
+              Start by documenting the evidence behind your current traction,
+              runway, and next milestone. Then decide whether to raise or learn more first.
             </p>
             <p className="mt-2 text-[11px] text-fg-muted font-mono">
-              Cited: Your last 3 months of growth · YC SAFE benchmarks · India Seed Fund 2024 portfolio
+              Sources and assumptions are shown with the recommendation when research is used.
             </p>
           </div>
           <div className="bg-fg/10 rounded-2xl rounded-tr-md px-4 py-3 text-[13px] text-fg ml-auto max-w-[70%] text-right">

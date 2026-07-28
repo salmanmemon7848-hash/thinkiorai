@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { PLAN_LIMITS } from '@/lib/constants'
 import type { Plan, Feature } from '@/types'
+import { effectivePlan } from '@/lib/plan'
 
 export async function GET(req: NextRequest) {
   const feature = req.nextUrl.searchParams.get('feature') as Feature | null
@@ -15,11 +16,11 @@ export async function GET(req: NextRequest) {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('plan')
+    .select('plan, plan_expires_at')
     .eq('id', user.id)
     .single()
 
-  const plan = (profile?.plan ?? 'free') as Plan
+  const plan = effectivePlan(profile)
 
   if (feature) {
     const today = new Date().toISOString().split('T')[0]

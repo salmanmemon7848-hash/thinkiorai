@@ -2,14 +2,14 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { ArrowRight, CheckCircle2, Sparkles, TrendingDown, TrendingUp, Search } from 'lucide-react'
+import { ArrowRight, CheckCircle2, Sparkles, TrendingDown, TrendingUp } from 'lucide-react'
 
 const WIRE_FEED = [
-  { delay: 900, kind: 'thinking', text: 'Analyzing Indian market...' },
-  { delay: 2200, kind: 'verdict', text: 'PIVOT', sub: '78% confidence' },
-  { delay: 2900, kind: 'metric', label: 'India TAM', value: '₹4,200 Cr', trend: 'down', note: 'Blinkit/Zepto saturating' },
-  { delay: 3500, kind: 'metric', label: 'Adjacent SAM', value: '₹1,100 Cr', trend: 'up', note: 'Rural kirana — 0 funded' },
-  { delay: 4200, kind: 'action', text: 'Interview 10 kirana owners this week' },
+  { delay: 900, kind: 'thinking', text: 'Reviewing your market and assumptions...' },
+  { delay: 2200, kind: 'verdict', text: 'PIVOT', sub: 'Decision guidance' },
+  { delay: 2900, kind: 'metric', label: 'Riskiest assumption', value: 'Demand', trend: 'down', note: 'Verify the customer problem before building' },
+  { delay: 3500, kind: 'metric', label: 'Evidence needed', value: '5 calls', trend: 'up', note: 'Talk to people with this problem this week' },
+  { delay: 4200, kind: 'action', text: 'Run five customer interviews before committing to the build' },
 ]
 
 export default function Hero() {
@@ -39,7 +39,7 @@ export default function Hero() {
               New
             </span>
             <span className="text-[13px] text-fg-dim group-hover:text-fg transition-colors">
-              Pitch Evaluator v2 is live for founders
+              A clearer path from idea to first revenue
             </span>
             <ArrowRight className="w-3 h-3 text-fg-muted group-hover:text-fg group-hover:translate-x-0.5 transition-all" />
           </Link>
@@ -50,14 +50,16 @@ export default function Hero() {
           className="font-display text-center font-bold text-[clamp(2.5rem,8vw,5.5rem)] leading-[0.98] tracking-tighter text-fg max-w-5xl mx-auto mb-6 opacity-0 animate-reveal-up"
           style={{ animationDelay: '150ms' }}
         >
-          The AI co-founder for{' '}
+          The guide for founders who want{' '}
           <span className="relative inline-block">
-            <span className="font-serif-italic font-normal text-accent">Indian founders</span>
+            <span className="font-serif-italic font-normal text-accent">better decisions</span>
             <svg
               className="absolute -bottom-1 left-0 w-full h-3"
               viewBox="0 0 200 12"
               preserveAspectRatio="none"
               fill="none"
+              width="200"
+              height="12"
             >
               <path
                 d="M2 8 Q 50 2, 100 6 T 198 5"
@@ -76,9 +78,8 @@ export default function Hero() {
           className="text-center text-lg md:text-xl text-fg-dim max-w-2xl mx-auto leading-relaxed mb-10 opacity-0 animate-fade-in-up"
           style={{ animationDelay: '350ms' }}
         >
-          Brutal verdicts on your startup idea. Real Indian competitor intelligence.
-          Unit economics in <span className="text-fg font-mono">₹</span>. Built for the way
-          India actually builds startups — not generic Silicon Valley advice.
+          Validate what matters, understand your market, and follow a practical route to first revenue.
+          Thinkior shows its sources and gives you the next test — you make the decisions and do the work.
         </p>
 
         {/* CTAs */}
@@ -90,7 +91,7 @@ export default function Hero() {
             href="/signup"
             className="btn-shine group w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-fg text-bg hover:bg-fg/90 font-semibold text-[15px] px-6 py-3.5 rounded-lg transition-all duration-300 shadow-glow-accent"
           >
-            Start free — validate an idea
+            Start free — find your next move
             <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
           </Link>
           <a
@@ -108,11 +109,11 @@ export default function Hero() {
         >
           <div className="flex items-center gap-2 text-xs text-fg-muted">
             <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse-dot" />
-            <span className="font-mono uppercase tracking-wider">1,800+ founders</span>
+            <span className="font-mono uppercase tracking-wider">Country-aware guidance</span>
           </div>
           <span className="text-fg-faint hidden sm:inline">·</span>
           <div className="flex items-center gap-2 text-xs text-fg-muted">
-            <span className="font-mono uppercase tracking-wider">47 cities across India</span>
+            <span className="font-mono uppercase tracking-wider">Visible research sources</span>
           </div>
           <span className="text-fg-faint hidden sm:inline">·</span>
           <div className="flex items-center gap-2 text-xs text-fg-muted">
@@ -141,7 +142,7 @@ export default function Hero() {
               </div>
               <div className="hidden sm:flex items-center gap-2 text-[11px] text-fg-muted font-mono">
                 <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse-dot" />
-                Live · GPT-4o + Gemini + Groq
+                Research-aware guidance
               </div>
             </div>
 
@@ -154,7 +155,7 @@ export default function Hero() {
                   </div>
                   <div className="flex-1">
                     <p className="text-[14px] text-fg leading-relaxed">
-                      Validate my idea: hyperlocal grocery delivery for Tier-2 Indian cities.
+                      Help me decide whether this problem is worth solving.
                     </p>
                   </div>
                 </div>
@@ -225,48 +226,33 @@ export default function Hero() {
                 </div>
               </div>
 
-              {/* Right metrics panel */}
+              {/* Guidance panel — illustrative, never presented as live data. */}
               <div className="bg-bg-sub p-5 hidden md:block">
                 <p className="font-mono text-[10px] uppercase tracking-caps text-fg-muted mb-4">
-                  Idea scorecard
+                  What to verify
                 </p>
                 <div className="space-y-4">
                   {[
-                    { label: 'Market signal', score: 78, color: 'signal-pivot' },
-                    { label: 'Unit economics', score: 42, color: 'signal-rose' },
-                    { label: 'Regulatory risk', score: 12, color: 'signal-go' },
-                    { label: 'Founder-market fit', score: 85, color: 'accent' },
+                    { label: 'Customer problem', action: 'Interview people who feel it', color: 'signal-pivot' },
+                    { label: 'Current alternatives', action: 'Map what they use today', color: 'signal-rose' },
+                    { label: 'Willingness to pay', action: 'Test a specific offer', color: 'signal-go' },
+                    { label: 'First channel', action: 'Choose one reachable audience', color: 'accent' },
                   ].map((m) => (
                     <div key={m.label}>
-                      <div className="flex items-baseline justify-between mb-1.5">
+                      <div className="flex items-baseline justify-between gap-2 mb-1.5">
                         <span className="text-[12px] text-fg-dim">{m.label}</span>
-                        <span className="font-mono text-[12px] font-semibold tabular text-fg">{m.score}</span>
+                        <CheckCircle2 className={`w-3.5 h-3.5 text-${m.color} flex-shrink-0`} />
                       </div>
-                      <div className="h-1 bg-bg-elevated rounded-full overflow-hidden">
-                        <div
-                          className={`h-full bg-${m.color} rounded-full transition-all duration-1000 ease-out`}
-                          style={{ width: `${m.score}%` }}
-                        />
-                      </div>
+                      <p className="text-[11px] text-fg-muted">{m.action}</p>
                     </div>
                   ))}
                 </div>
 
                 <div className="mt-7 pt-5 border-t border-line">
                   <p className="font-mono text-[10px] uppercase tracking-caps text-fg-muted mb-3">
-                    Competitors detected
+                    Founder rule
                   </p>
-                  <div className="space-y-2">
-                    {['Blinkit', 'Zepto', 'Instamart'].map((c) => (
-                      <div key={c} className="flex items-center justify-between text-[12px]">
-                        <div className="flex items-center gap-2">
-                          <Search className="w-3 h-3 text-fg-muted" />
-                          <span className="text-fg">{c}</span>
-                        </div>
-                        <span className="font-mono text-fg-muted">Funded</span>
-                      </div>
-                    ))}
-                  </div>
+                  <p className="text-xs leading-relaxed text-fg-dim">A score is only useful when the evidence, uncertainty, and next test are visible.</p>
                 </div>
               </div>
             </div>
@@ -274,7 +260,7 @@ export default function Hero() {
 
           {/* Caption */}
           <p className="text-center text-xs text-fg-muted mt-5 font-mono uppercase tracking-wider">
-            Live output · Not a mock
+            Example founder workflow
           </p>
         </div>
       </div>

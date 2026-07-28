@@ -244,6 +244,7 @@ export default function AIChatInterface({
               content={msg.content}
               card={msg.card ?? null}
               cardKind={msg.cardKind ?? null}
+              sources={msg.sources}
             />
           )
         )}

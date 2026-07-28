@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components {
+  .workspace-input {
+    @apply w-full rounded-md border border-line bg-bg px-3 py-2 text-xs text-fg placeholder:text-fg-muted outline-none transition-colors focus:border-accent disabled:opacity-50;
+  }
+}
+
 :root {
   --bg: #0A0A0B;
   --bg-sub: #0E0E10;

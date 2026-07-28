@@ -30,7 +30,7 @@ const instrument = Instrument_Serif({
 })
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://thinkiorai.com'),
+  metadataBase: new URL('https://www.thinkiorai.com'),
   title: {
     default: 'Thinkior AI — Intelligence for Indian Founders',
     template: '%s — Thinkior AI',
@@ -50,17 +50,17 @@ export const metadata: Metadata = {
     '₹ unit economics',
     'thinkior',
   ],
-  authors: [{ name: 'Thinkior AI', url: 'https://thinkiorai.com' }],
+  authors: [{ name: 'Thinkior AI', url: 'https://www.thinkiorai.com' }],
   creator: 'Salman Memon',
   publisher: 'Thinkior AI',
   alternates: {
-    canonical: 'https://thinkiorai.com',
+    canonical: 'https://www.thinkiorai.com',
   },
   openGraph: {
     title: 'Thinkior AI — Intelligence for Indian Founders',
     description:
       'AI co-founder for Indian founders. Indian competitor intel, TAM/SAM/SOM in ₹, regulatory risks, unit economics. Investor-grade reports in 60s.',
-    url: 'https://thinkiorai.com',
+    url: 'https://www.thinkiorai.com',
     siteName: 'Thinkior AI',
     type: 'website',
     locale: 'en_IN',

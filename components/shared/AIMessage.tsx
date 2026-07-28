@@ -1,6 +1,6 @@
 'use client'
 
-import { Sparkles } from 'lucide-react'
+import { ExternalLink, ShieldCheck, Sparkles } from 'lucide-react'
 import { cn } from '@/lib/utils/cn'
 import { parseThinkiorCard, type CardKind } from '@/lib/ai/cardParser'
 import {
@@ -14,6 +14,7 @@ import ValidatorCardView from '@/components/features/validator/ValidatorCard'
 import CompetitorCardView from '@/components/features/competitor/CompetitorCard'
 import PitchCardView from '@/components/features/pitch/PitchCard'
 import IdeasCardView from '@/components/features/ideas/IdeasCard'
+import type { ResearchSource } from '@/types'
 
 interface AIMessageProps {
   content: string
@@ -21,10 +22,15 @@ interface AIMessageProps {
   /** Optional structured card payload already parsed server-side. */
   card?: unknown | null
   cardKind?: CardKind | null
+  sources?: ResearchSource[]
+}
+
+function escapeHtml(text: string): string {
+  return text.replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char] || char))
 }
 
 function renderMarkdown(text: string): string {
-  return text
+  return escapeHtml(text)
     .replace(/^### (.+)$/gm, '<h3>$1</h3>')
     .replace(/^## (.+)$/gm, '<h2>$1</h2>')
     .replace(/^# (.+)$/gm, '<h1>$1</h1>')
@@ -42,7 +48,7 @@ function renderMarkdown(text: string): string {
     .replace(/^(?!<[hul]|<hr|<tr)(.+)$/gm, '$1')
 }
 
-export default function AIMessage({ content, className, card, cardKind }: AIMessageProps) {
+export default function AIMessage({ content, className, card, cardKind, sources = [] }: AIMessageProps) {
   let resolvedCard: unknown = card ?? null
   let resolvedText = content
   let resolvedKind: CardKind = cardKind ?? 'validator'
@@ -137,6 +143,22 @@ export default function AIMessage({ content, className, card, cardKind }: AIMess
       {ideasCard && (
         <div className="sm:pl-10">
           <IdeasCardView card={ideasCard} />
+        </div>
+      )}
+      {sources.length > 0 && (
+        <div className="sm:pl-10">
+          <div className="rounded-lg border border-line bg-bg-sub p-3">
+            <div className="flex items-center gap-2 mb-2"><ShieldCheck className="w-3.5 h-3.5 text-accent" /><p className="text-[10px] uppercase tracking-caps font-mono text-fg-muted">Research sources — verify before acting</p></div>
+            <ul className="space-y-2">
+              {sources.map((source) => (
+                <li key={source.url} className="text-xs leading-relaxed">
+                  <a href={source.url} target="_blank" rel="noreferrer" className="text-accent hover:underline inline-flex items-center gap-1">{source.title || 'Open source'}<ExternalLink className="w-3 h-3" /></a>
+                  <p className="text-fg-muted mt-0.5 line-clamp-2">{source.snippet}</p>
+                  <p className="text-fg-faint font-mono text-[10px] mt-0.5">Retrieved {new Date(source.retrievedAt).toLocaleDateString()} · {source.confidence} relevance</p>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       )}
       {/* Preview card is rendered inline by FastPreview, not here. */}

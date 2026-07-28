@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useCallback } from 'react'
-import type { ChatMessage, Feature } from '@/types'
+import type { ChatMessage, Feature, ResearchSource } from '@/types'
 
 /**
  * A message in the chat, optionally carrying a parsed structured
@@ -9,7 +9,7 @@ import type { ChatMessage, Feature } from '@/types'
  */
 export interface ChatMessageWithCard extends ChatMessage {
   card?: unknown | null
-  cardKind?: 'validator' | 'preview' | null
+  cardKind?: 'validator' | 'preview' | 'competitor' | 'pitch' | 'ideas' | null
 }
 
 export function useChat(feature: Feature) {
@@ -61,6 +61,7 @@ export function useChat(feature: Feature) {
           timestamp: new Date().toISOString(),
           card: data.card ?? null,
           cardKind: data.cardKind ?? null,
+          sources: (data.sources ?? []) as ResearchSource[],
         }
         setMessages((prev) => [...prev, assistantMessage])
       } catch {

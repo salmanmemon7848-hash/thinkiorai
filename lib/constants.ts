@@ -2,11 +2,11 @@ import type { PlanLimits, Plan } from '@/types'
 
 export const PLAN_LIMITS: Record<Plan, PlanLimits> = {
   free: {
-    validator: 1,    // 1 free Business Validation / lifetime
-    competitor: 1,   // 1 free Competitor Intel run / lifetime
-    ideas: 1,        // 1 free Ideas session / lifetime
-    pitch: 1,        // 1 free Pitch Evaluation / lifetime
-    chat: 5,         // 5 AI Chat messages / lifetime
+    validator: 1,    // 1 free Business Validation / day
+    competitor: 1,   // 1 free Competitor Intel run / day
+    ideas: 1,        // 1 free Ideas session / day
+    pitch: 1,        // 1 free Pitch Evaluation / day
+    chat: 5,         // 5 AI Chat messages / day
     report: 0,       // Locked — Founder Pro only
   },
   builder: {
@@ -63,5 +63,5 @@ export const FEATURE_NAMES: Record<string, string> = {
 
 export const APP_NAME = 'Thinkior AI'
 export const APP_TAGLINE = 'Your idea deserves the truth.'
-export const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://thinkiorai.com'
+export const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://www.thinkiorai.com'
 export const CONTACT_EMAIL = 'hello@thinkior.com'

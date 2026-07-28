@@ -72,6 +72,45 @@ export interface ChatMessage {
   role: 'user' | 'assistant'
   content: string
   timestamp?: string
+  sources?: ResearchSource[]
+}
+
+export interface ResearchSource {
+  title: string
+  url: string
+  snippet: string
+  confidence: 'high' | 'medium' | 'low'
+  retrievedAt: string
+}
+
+export type EvidenceStatus = 'verified' | 'unverified' | 'assumption'
+export type EvidenceConfidence = 'high' | 'medium' | 'low'
+
+export interface FounderEvidence {
+  id: string
+  title: string
+  claim: string
+  kind: string
+  source_url: string | null
+  source_title: string | null
+  source_date: string | null
+  confidence: EvidenceConfidence
+  status: EvidenceStatus
+  notes: string | null
+  created_at: string
+}
+
+export interface FounderExperiment {
+  id: string
+  title: string
+  hypothesis: string | null
+  success_metric: string | null
+  resource_url: string | null
+  resource_title: string | null
+  due_date: string | null
+  status: 'planned' | 'running' | 'complete' | 'stopped'
+  outcome: string | null
+  created_at: string
 }
 
 export interface AIRequest {
@@ -84,6 +123,7 @@ export interface AIResponse {
   result: string
   provider: string | null
   fallbackTriggered: boolean
+  sources?: ResearchSource[]
 }
 
 export interface FeatureGateProps {

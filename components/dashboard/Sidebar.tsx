@@ -18,6 +18,7 @@ import {
   Sparkles,
   FileText,
   Lock,
+  Compass,
   Command,
   ChevronRight,
 } from 'lucide-react'
@@ -31,7 +32,6 @@ type NavItem = {
   label: string
   href: string
   accent?: string
-  shortcut?: string
   lockFor?: Plan[]
 }
 
@@ -39,18 +39,19 @@ const NAV_GROUPS: Array<{ label: string; items: NavItem[] }> = [
   {
     label: 'Overview',
     items: [
-      { icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard', shortcut: 'D' },
+      { icon: Compass, label: 'Founder Workspace', href: '/workspace' },
+      { icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard' },
     ],
   },
   {
     label: 'Founder OS',
     items: [
-      { icon: CheckCircle2, label: 'Business Validator', href: '/validator', accent: 'accent', shortcut: '1' },
-      { icon: Search, label: 'Competitor Intel', href: '/competitor', accent: 'signal-insight', shortcut: '2', lockFor: ['free'] as Plan[] },
-      { icon: Lightbulb, label: 'Ideas Desk', href: '/ideas', accent: 'signal-pivot', shortcut: '3' },
-      { icon: Presentation, label: 'Pitch Evaluator', href: '/pitch', accent: 'signal-violet', shortcut: '4' },
-      { icon: FileText, label: 'Business Reports', href: '/reports', accent: 'accent', shortcut: '5', lockFor: ['free', 'builder'] as Plan[] },
-      { icon: MessageSquare, label: 'Co-founder Desk', href: '/chat', accent: 'fg', shortcut: '6' },
+      { icon: CheckCircle2, label: 'Business Validator', href: '/validator', accent: 'accent' },
+      { icon: Search, label: 'Competitor Intel', href: '/competitor', accent: 'signal-insight' },
+      { icon: Lightbulb, label: 'Ideas Desk', href: '/ideas', accent: 'signal-pivot' },
+      { icon: Presentation, label: 'Pitch Evaluator', href: '/pitch', accent: 'signal-violet' },
+      { icon: FileText, label: 'Business Reports', href: '/reports', accent: 'accent', lockFor: ['free', 'builder'] as Plan[] },
+      { icon: MessageSquare, label: 'Co-founder Desk', href: '/chat', accent: 'fg' },
     ],
   },
 ]
@@ -106,7 +107,8 @@ function SidebarContent({
         </p>
       </div>
 
-      {/* Quick command */}
+      {/* Quick command is intentionally hidden until it has real command handling. */}
+      {false && (
       <div className="px-3">
         <button className="w-full flex items-center justify-between gap-2 bg-bg-card hover:bg-bg-elevated border border-line hover:border-line-strong rounded-md px-3 py-2 transition-colors text-left group">
           <div className="flex items-center gap-2 min-w-0">
@@ -118,6 +120,7 @@ function SidebarContent({
           <span className="kbd flex-shrink-0">⌘K</span>
         </button>
       </div>
+      )}
 
       {/* Nav */}
       <nav className="flex-1 px-3 py-5 overflow-y-auto">
@@ -171,11 +174,6 @@ function SidebarContent({
                         strokeWidth={2}
                         aria-label="Locked feature"
                       />
-                    )}
-                    {item.shortcut && (
-                      <span className="kbd opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
-                        {item.shortcut}
-                      </span>
                     )}
                   </Link>
                 )

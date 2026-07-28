@@ -460,28 +460,17 @@ export function DataDeletionSection() {
 
   const requestDeletion = async () => {
     setDeleting(true)
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
-    if (!user) return
-
-    // Log deletion request (for compliance audit trail)
-    await supabase.from('data_deletion_requests').insert({
-      user_id: user.id,
-      requested_at: new Date().toISOString(),
-      status: 'pending',
-    })
-
-    // Immediately clear founder data
-    await supabase.from('founder_profiles').delete().eq('user_id', user.id)
-    await supabase.from('founder_sessions').delete().eq('user_id', user.id)
-    await supabase.from('user_consents').delete().eq('user_id', user.id)
+    const response = await fetch('/api/account/delete', { method: 'POST' })
+    if (!response.ok) {
+      setDeleting(false)
+      return
+    }
 
     localStorage.removeItem('thinkior_consent')
     localStorage.removeItem('thinkior_consent_version')
 
     setDone(true)
-    setTimeout(() => supabase.auth.signOut(), 2000)
+    setTimeout(() => supabase.auth.signOut(), 1200)
   }
 
   if (done) {

@@ -23,6 +23,7 @@ interface FounderProfile {
   idea_description: string
   domain: string
   target_customer: string
+  operating_country: string
   onboarding_completed: boolean
   created_at?: string
 }
@@ -76,6 +77,7 @@ export default function OnboardingWizard() {
     idea_description: '',
     domain: '',
     target_customer: '',
+    operating_country: '',
   })
 
   useEffect(() => {
@@ -135,6 +137,7 @@ export default function OnboardingWizard() {
         idea_description: profile.idea_description,
         domain: profile.domain,
         target_customer: profile.target_customer,
+        operating_country: profile.operating_country,
         onboarding_completed: true,
         created_at: new Date().toISOString(),
       })
@@ -251,6 +254,18 @@ export default function OnboardingWizard() {
                       maxLength={500}
                     />
                     <div className="char-count">{profile.idea_description?.length ?? 0}/500</div>
+                  </div>
+
+                  <div className="field-wrap">
+                    <label className="field-label">Primary market or country</label>
+                    <input
+                      type="text"
+                      className="text-input"
+                      placeholder="e.g. United States, Germany, India, Global"
+                      value={profile.operating_country ?? ''}
+                      onChange={(e) => update('operating_country', e.target.value)}
+                      maxLength={80}
+                    />
                   </div>
                 </div>
               )}
