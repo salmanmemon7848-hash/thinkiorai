@@ -33,7 +33,7 @@ export default function TermsPage() {
         </p>
         <ul>
           <li>Business idea validation (GO / KILL / PIVOT verdicts)</li>
-          <li>Competitor research and intelligence (Builder plan and above)</li>
+          <li>Marketing Engine strategy, content packs, and weekly reviews</li>
           <li>Public-source lead research and outreach drafting</li>
           <li>Idea generation sessions</li>
           <li>AI chat with business context (Co-founder Desk)</li>

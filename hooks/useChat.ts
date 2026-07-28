@@ -5,11 +5,11 @@ import type { ChatMessage, Feature, ResearchSource } from '@/types'
 
 /**
  * A message in the chat, optionally carrying a parsed structured
- * card payload (Validator scorecard, Competitor map, etc).
+ * card payload (Validator scorecard, Ideas plan, etc).
  */
 export interface ChatMessageWithCard extends ChatMessage {
   card?: unknown | null
-  cardKind?: 'validator' | 'preview' | 'competitor' | 'ideas' | null
+  cardKind?: 'validator' | 'preview' | 'ideas' | null
 }
 
 export function useChat(feature: Feature) {

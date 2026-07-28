@@ -14,7 +14,7 @@ import Link from 'next/link'
 import {
   ArrowUpRight,
   CheckCircle2,
-  Search,
+  Megaphone,
   Lightbulb,
   Target,
   FileText,
@@ -27,7 +27,7 @@ import type { Plan } from '@/types'
 
 const ICON_MAP: Record<ToolIconKey, typeof CheckCircle2> = {
   validator: CheckCircle2,
-  competitor: Search,
+  marketing: Megaphone,
   ideas: Lightbulb,
   leads: Target,
   reports: FileText,

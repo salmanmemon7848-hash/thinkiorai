@@ -9,7 +9,6 @@ export interface ReportInput {
   targetMarket?: string
   currentRevenue?: string
   mainChallenge?: string
-  competitors?: string
   goals?: string
   teamSize?: string
   location?: string
@@ -53,14 +52,12 @@ const JSON_SCHEMA = `{
       "buying_behavior": ""
     }
   },
-  "competitor_analysis": {
-    "landscape_overview": "",
-    "competitors": [
-      { "name": "real name from search", "type": "Direct|Indirect", "strengths": ["..."], "weaknesses": ["..."], "market_position": "" }
-    ],
-    "competitive_advantages": ["..."],
-    "competitive_risks": ["..."],
-    "market_gap": ""
+  "marketing_engine": {
+    "positioning": "",
+    "audience": "",
+    "platform_roles": [{ "platform": "Instagram|Facebook|YouTube|LinkedIn", "role": "", "content_formats": ["..."] }],
+    "content_pillars": ["..."],
+    "launch_experiments": [{ "experiment": "", "success_metric": "", "timeline": "" }]
   },
   "swot_analysis": {
     "strengths": ["5-7"], "weaknesses": ["5-7"], "opportunities": ["5-7"], "threats": ["5-7"]
@@ -128,13 +125,13 @@ export function getReportSystemPrompt(input: ReportInput): string {
 SCHEMA (every key required, use "" or [] if unknown):
 ${JSON_SCHEMA}
 
-RULES: Use Indian context (₹, Indian competitors, SEBI/RBI/FSSAI). Be specific and honest. Use real competitor names from search results. verdict must start with "Strong opportunity", "Proceed with caution", or "High risk". Return ONLY the JSON.`
+RULES: Use the founder's selected market context. Be specific and honest. Do not invent current market facts or competitor claims. The verdict must start with "Strong opportunity", "Proceed with caution", or "High risk". Return ONLY the JSON.`
 }
 
 export function buildReportSearchQueries(input: ReportInput): string[] {
   return [
     `${input.industry} India market size trends 2025`,
-    `${input.industry} top competitors India startup`,
+    `${input.industry} social media marketing strategy startup`,
     `${input.industry} India startup growth opportunities`,
   ]
 }
@@ -150,14 +147,13 @@ export function buildReportUserPrompt(input: ReportInput, searchContext: string)
 - Target Market: ${input.targetMarket || 'Not provided'}
 - Current Revenue: ${input.currentRevenue || 'Not provided'}
 - Main Challenge: ${input.mainChallenge || 'Not provided'}
-- Known Competitors: ${input.competitors || 'Not provided'}
 - Goals: ${input.goals || 'Not provided'}
 - Team Size: ${input.teamSize || 'Not provided'}
 - Location: ${input.location || 'Not provided'}
 - Funding: ${input.fundingStatus || 'Not provided'}
 - Unique Advantage: ${input.uniqueAdvantage || 'Not provided'}
 
-LIVE WEB SEARCH RESULTS (use for real market data, competitor names, trends):
+LIVE WEB SEARCH RESULTS (use only for broad market context; do not make unsupported competitor or trend claims):
 ${searchContext || '(no live results available — rely on your own knowledge)'}
 
 Generate the complete professional business report JSON now. Set meta.generated_at to "${new Date().toISOString()}".`

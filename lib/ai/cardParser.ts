@@ -18,11 +18,10 @@ import { z, ZodTypeAny } from 'zod'
 import {
   ValidatorCardSchema,
   ValidatorPreviewSchema,
-  CompetitorCardSchema,
   IdeasCardSchema,
 } from './cardSchemas'
 
-export type CardKind = 'validator' | 'preview' | 'competitor' | 'ideas'
+export type CardKind = 'validator' | 'preview' | 'ideas'
 
 export interface ParsedMessage<T = unknown> {
   /** The original text, with the structured block removed. */
@@ -40,7 +39,6 @@ const COMMENT_RE = /<!--\s*THINKIOR_(CARD|PREVIEW)\s*:\s*([\s\S]*?)\s*-->/i
 const SCHEMAS: Record<CardKind, ZodTypeAny> = {
   validator: ValidatorCardSchema,
   preview: ValidatorPreviewSchema,
-  competitor: CompetitorCardSchema,
   ideas: IdeasCardSchema,
 }
 

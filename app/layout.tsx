@@ -36,12 +36,12 @@ export const metadata: Metadata = {
     template: '%s — Thinkior AI',
   },
   description:
-    'AI co-founder for Indian founders. Indian competitor intel, TAM/SAM/SOM in ₹, regulatory risks, unit economics. Investor-grade reports in 60s.',
+    'AI co-founder for global founders. Validate ideas, build a practical social marketing roadmap, find source-backed leads, and make clearer decisions.',
   keywords: [
     'AI co-founder',
     'Indian startup',
     'business validator',
-    'competitor analysis',
+    'marketing roadmap',
     'lead finder',
     'startup India',
     'founder tools',
@@ -59,7 +59,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Thinkior AI — Intelligence for Indian Founders',
     description:
-      'AI co-founder for Indian founders. Indian competitor intel, TAM/SAM/SOM in ₹, regulatory risks, unit economics. Investor-grade reports in 60s.',
+      'AI co-founder for global founders. Validate ideas, build a practical social marketing roadmap, find source-backed leads, and make clearer decisions.',
     url: 'https://www.thinkiorai.com',
     siteName: 'Thinkior AI',
     type: 'website',
@@ -69,7 +69,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Thinkior AI — Intelligence for Indian Founders',
     description:
-      'AI co-founder for Indian founders. Indian competitor intel, TAM/SAM/SOM in ₹, regulatory risks, unit economics. Investor-grade reports in 60s.',
+      'AI co-founder for global founders. Validate ideas, build a practical social marketing roadmap, find source-backed leads, and make clearer decisions.',
     creator: '@thinkiorai',
   },
   robots: {

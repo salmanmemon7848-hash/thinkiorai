@@ -2,7 +2,7 @@ export type Plan = 'free' | 'builder' | 'founder_pro'
 
 export type Feature =
   | 'validator'
-  | 'competitor'
+  | 'marketing'
   | 'ideas'
   | 'leads'
   | 'chat'
@@ -21,7 +21,7 @@ export interface UserProfile {
 
 export interface PlanLimits {
   validator: number
-  competitor: number
+  marketing: number
   ideas: number
   leads: number
   chat: number
@@ -145,6 +145,61 @@ export interface FounderLead extends LeadCandidate {
   follow_up_at: string | null
   created_at: string
   updated_at: string
+}
+
+export type MarketingPlatform = 'instagram' | 'facebook' | 'youtube' | 'linkedin'
+export type MarketingPackStatus = 'planned' | 'created' | 'published' | 'learned'
+
+export interface MarketingProfile {
+  id: string
+  business_name: string | null
+  offer: string
+  audience: string
+  country: string
+  goal: string
+  capacity: string
+  stage: string
+  current_channels: string | null
+  platforms: MarketingPlatform[]
+  strategy: Record<string, unknown>
+  starter_used_at: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface MarketingRoadmap {
+  id: string
+  week_start: string
+  revision: number
+  objective: string
+  strategy: Record<string, unknown>
+  created_at: string
+}
+
+export interface MarketingContentPack {
+  id: string
+  roadmap_id: string | null
+  platform: MarketingPlatform
+  content_type: string
+  title: string
+  objective: string
+  scheduled_for: string | null
+  status: MarketingPackStatus
+  content: Record<string, string>
+  created_at: string
+  updated_at: string
+}
+
+export interface MarketingReview {
+  id: string
+  roadmap_id: string | null
+  views: number
+  engagement: number
+  leads: number
+  sales: number
+  notes: string | null
+  next_priority: string | null
+  created_at: string
 }
 
 export interface AIRequest {

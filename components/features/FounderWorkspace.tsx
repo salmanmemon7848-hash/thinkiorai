@@ -48,7 +48,7 @@ type Review = {
 
 const JOURNEY = [
   { label: 'Validate', href: '/validator', description: 'Prove the problem and your riskiest assumption.' },
-  { label: 'Research', href: '/competitor', description: 'Collect evidence, competitors, and market context.' },
+  { label: 'Go to market', href: '/marketing', description: 'Turn your business context into a practical social roadmap.' },
   { label: 'Decide', href: '#decisions', description: 'Make a choice and state what should happen next.' },
   { label: 'Go to market', href: '#gtm', description: 'Clarify customer, message, channel, and first test.' },
   { label: 'Review', href: '#review', description: 'Turn learning into the next weekly focus.' },
@@ -238,13 +238,13 @@ export default function FounderWorkspace() {
         <Panel icon={Search} title="Evidence hub" description="Save what you know, identify what is only an assumption, and keep the original source close.">
           <form onSubmit={addEvidence} className="grid sm:grid-cols-2 gap-2 mb-4">
             <Field name="title" placeholder="Evidence title" required />
-            <select name="kind" className="workspace-input"><option value="market">Market</option><option value="competitor">Competitor</option><option value="customer">Customer</option><option value="risk">Risk</option></select>
+            <select name="kind" className="workspace-input"><option value="market">Market</option><option value="customer">Customer</option><option value="marketing">Marketing</option><option value="risk">Risk</option></select>
             <Field name="claim" placeholder="What does this evidence suggest?" required className="sm:col-span-2" />
             <Field name="source_title" placeholder="Source name (optional)" />
             <Field name="source_url" type="url" placeholder="Source URL (optional)" />
             <Submit disabled={saving} label="Save evidence" />
           </form>
-          <div className="space-y-2">{evidence.length ? evidence.map((item) => <EvidenceRow key={item.id} item={item} />) : <Empty text="No evidence yet. Start with a market claim, customer quote, competitor fact, or risk." />}</div>
+          <div className="space-y-2">{evidence.length ? evidence.map((item) => <EvidenceRow key={item.id} item={item} />) : <Empty text="No evidence yet. Start with a market claim, customer quote, marketing learning, or risk." />}</div>
         </Panel>
 
         <Panel icon={Compass} title="Decision log" description="State the call, why you made it, and what should happen if it is right." id="decisions">

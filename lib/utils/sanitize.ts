@@ -28,7 +28,7 @@ export function sanitizeMessages(
 }
 
 export function sanitizeFeature(feature: unknown): string {
-  const valid = ['validator', 'competitor', 'ideas', 'chat']
+  const valid = ['validator', 'ideas', 'chat']
   if (typeof feature !== 'string') return ''
   return valid.includes(feature) ? feature : ''
 }

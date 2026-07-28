@@ -6,7 +6,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import {
   LayoutDashboard,
   CheckCircle2,
-  Search,
+  Megaphone,
   Lightbulb,
   Target,
   MessageSquare,
@@ -47,7 +47,7 @@ const NAV_GROUPS: Array<{ label: string; items: NavItem[] }> = [
     label: 'Founder OS',
     items: [
       { icon: CheckCircle2, label: 'Business Validator', href: '/validator', accent: 'accent' },
-      { icon: Search, label: 'Competitor Intel', href: '/competitor', accent: 'signal-insight' },
+      { icon: Megaphone, label: 'Marketing Engine', href: '/marketing', accent: 'accent' },
       { icon: Lightbulb, label: 'Ideas Desk', href: '/ideas', accent: 'signal-pivot' },
       { icon: Target, label: 'Leads Finder', href: '/leads', accent: 'accent' },
       { icon: FileText, label: 'Business Reports', href: '/reports', accent: 'accent', lockFor: ['free', 'builder'] as Plan[] },

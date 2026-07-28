@@ -37,6 +37,21 @@ export async function GET(req: NextRequest) {
         period: 'lifetime',
       })
     }
+    if (feature === 'marketing') {
+      const period = plan === 'free' ? '1970-01-01' : new Date().toISOString().split('T')[0]
+      const { count } = await supabase
+        .from('founder_marketing_usage')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .eq('kind', 'content')
+        .eq('period_start', period)
+      const used = count ?? 0
+      const limit = PLAN_LIMITS[plan].marketing
+      return NextResponse.json({
+        count: Math.min(used, limit), limit, remaining: Math.max(0, limit - used), exceeded: used >= limit,
+        period: plan === 'free' ? 'lifetime' : 'daily',
+      })
+    }
     const today = new Date().toISOString().split('T')[0]
     const { data } = await supabase
       .from('daily_usage')

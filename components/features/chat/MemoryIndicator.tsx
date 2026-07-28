@@ -21,7 +21,7 @@ import {
   X,
   RotateCw,
   Rocket,
-  Search,
+  Megaphone,
   Lightbulb,
   UsersRound,
   MessageSquare,
@@ -43,7 +43,7 @@ export interface MemorySession {
 
 const MODULE_ICON: Record<string, React.ElementType> = {
   validator: CheckCircle2,
-  competitor: Search,
+  marketing: Megaphone,
   ideas: Lightbulb,
   leads: UsersRound,
   chat: MessageSquare,
@@ -51,7 +51,7 @@ const MODULE_ICON: Record<string, React.ElementType> = {
 }
 const MODULE_LABEL: Record<string, string> = {
   validator: 'Validator',
-  competitor: 'Competitor',
+  marketing: 'Marketing Engine',
   ideas: 'Ideas',
   leads: 'Leads Finder',
   chat: 'Chat',

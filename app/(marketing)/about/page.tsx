@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 
 const TOOLS = [
   'Business Validator',
-  'Competitor Intel',
+  'Marketing Engine',
   'Ideas Desk',
   'Leads Finder',
   'Co-founder Desk',

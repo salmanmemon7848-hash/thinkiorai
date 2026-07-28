@@ -3,7 +3,6 @@ import { createClient } from '@/lib/supabase/server'
 import { aiHandler } from '@/lib/ai/handler'
 import { sanitizeMessages, sanitizeFeature } from '@/lib/utils/sanitize'
 import { getValidatorPrompt } from '@/lib/ai/prompts/validator'
-import { getCompetitorPrompt } from '@/lib/ai/prompts/competitor'
 import { getIdeasPrompt } from '@/lib/ai/prompts/ideas'
 import { getChatPrompt } from '@/lib/ai/prompts/chat'
 import { getFounderContextBlock } from '@/lib/ai/prompts/masterPrompts'
@@ -15,11 +14,10 @@ import { parseThinkiorCard } from '@/lib/ai/cardParser'
 import type { Plan, Feature } from '@/types'
 import { effectivePlan } from '@/lib/plan'
 
-const SEARCH_FEATURES = new Set(['competitor', 'validator', 'ideas'])
+const SEARCH_FEATURES = new Set(['validator', 'ideas'])
 
 const FEATURE_LABEL: Record<string, string> = {
   validator: 'Business Validator',
-  competitor: 'Competitor Research',
   ideas: 'Business Ideas',
   chat: 'AI Chat',
   report: 'Business Reports',
@@ -27,7 +25,6 @@ const FEATURE_LABEL: Record<string, string> = {
 
 const COMPLEXITY: Record<string, 'simple' | 'complex'> = {
   validator: 'complex',
-  competitor: 'complex',
   ideas: 'complex',
   chat: 'simple',
 }
@@ -36,8 +33,6 @@ function getSystemPrompt(feature: string, lastUserMessage: string): string {
   switch (feature) {
     case 'validator':
       return getValidatorPrompt(lastUserMessage)
-    case 'competitor':
-      return getCompetitorPrompt(lastUserMessage)
     case 'ideas':
       return getIdeasPrompt(lastUserMessage)
     case 'chat':
@@ -54,9 +49,6 @@ function getSystemPrompt(feature: string, lastUserMessage: string): string {
 function extractCardForFeature(feature: string, text: string): unknown | null {
   if (feature === 'validator') {
     return parseThinkiorCard(text, 'validator').card ?? null
-  }
-  if (feature === 'competitor') {
-    return parseThinkiorCard(text, 'competitor').card ?? null
   }
   if (feature === 'ideas') {
     return parseThinkiorCard(text, 'ideas').card ?? null
@@ -318,7 +310,6 @@ export async function POST(req: NextRequest) {
       card: extractCardForFeature(feature, response.result),
       cardKind:
         feature === 'validator' ||
-        feature === 'competitor' ||
         feature === 'ideas'
           ? feature
           : null,

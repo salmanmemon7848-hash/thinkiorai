@@ -19,7 +19,7 @@ export default function PrivacyPage() {
           Thinkior AI (&ldquo;Thinkior&rdquo;, &ldquo;we&rdquo;, &ldquo;us&rdquo;, or &ldquo;our&rdquo;) is an
           AI-powered platform built for early-stage Indian founders, accessible at{' '}
           <strong>thinkiorai.com</strong> (the &ldquo;Platform&rdquo;). We provide tools for business
-          validation, competitor research, public lead research, idea generation, AI-assisted analysis,
+          validation, social marketing guidance, public lead research, idea generation, AI-assisted analysis,
           and investor-grade business reports.
         </p>
         <p>
@@ -59,7 +59,7 @@ export default function PrivacyPage() {
 
         <SubHeading>2.4 AI Queries &amp; Outputs</SubHeading>
         <p>
-          When you use any AI feature (Business Validator, Competitor Intel, Ideas Desk,
+          When you use any AI feature (Business Validator, Marketing Engine, Ideas Desk,
           Leads Finder, Co-founder Desk Chat, or Business Reports), your input prompt and
           the AI-generated output are sent to our AI inference providers
           (<strong>Groq</strong> and <strong>Cerebras</strong>) to generate a response.
@@ -156,7 +156,7 @@ export default function PrivacyPage() {
           </li>
           <li>
             <strong>SearXNG (self-hosted)</strong> — meta-search engine we use to gather
-            public web data for competitor research and reports. We host this ourselves; no
+            public web data for lead research and reports. We host this ourselves; no
             third party sees your queries.
           </li>
           <li>

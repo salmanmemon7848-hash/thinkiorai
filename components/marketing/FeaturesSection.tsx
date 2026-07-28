@@ -1,6 +1,6 @@
 import {
   CheckCircle2,
-  Search,
+  Megaphone,
   Lightbulb,
   MessageSquare,
   UsersRound,
@@ -36,9 +36,9 @@ export default function FeaturesSection() {
 
         {/* Bento grid */}
         <div className="grid md:grid-cols-12 gap-4 md:gap-5">
-          {/* Row 1: Validator (7) + Competitor (5) */}
+          {/* Row 1: Validator (7) + Marketing Engine (5) */}
           <FeatureCardLarge />
-          <FeatureCardCompetitor />
+          <FeatureCardMarketing />
 
           {/* Row 2: Reports (4) + Ideas (4) + Pitch (4) */}
           <FeatureCardReports />
@@ -114,25 +114,24 @@ function FeatureCardLarge() {
   )
 }
 
-/* === Competitor === */
-function FeatureCardCompetitor() {
+/* === Marketing Engine === */
+function FeatureCardMarketing() {
   return (
     <Link
       href="/signup"
       className="md:col-span-5 group card-premium rounded-2xl p-7 md:p-8 hover:bg-bg-elevated transition-all duration-500"
     >
       <div className="flex items-center gap-3 mb-6">
-        <div className="w-9 h-9 rounded-lg bg-signal-insight/15 border border-signal-insight/30 flex items-center justify-center">
-          <Search className="w-4 h-4 text-signal-insight" />
+        <div className="w-9 h-9 rounded-lg bg-accent/15 border border-accent/30 flex items-center justify-center">
+          <Megaphone className="w-4 h-4 text-accent" />
         </div>
-        <span className="eyebrow">Competitor Intel</span>
+        <span className="eyebrow">Marketing Engine</span>
       </div>
       <h3 className="font-display font-bold text-2xl text-fg tracking-tight leading-[1.1] mb-4">
-        Map the battlefield before you enter.
+        Turn your niche into a weekly social roadmap.
       </h3>
       <p className="text-[14px] text-fg-dim leading-relaxed mb-7">
-        Research the market, collect source-backed competitor evidence, and spot the
-        assumptions you need to verify before you enter.
+        Build a focused strategy, practical content packs, Reel scripts, captions, and poster prompts. You review and publish manually.
       </p>
 
       {/* Mini chart preview */}
@@ -157,8 +156,8 @@ function FeatureCardCompetitor() {
         ))}
       </div>
 
-      <div className="flex items-center gap-2 text-signal-insight font-medium text-sm group-hover:gap-3 transition-all">
-        Try Competitor Intel
+      <div className="flex items-center gap-2 text-accent font-medium text-sm group-hover:gap-3 transition-all">
+        Try Marketing Engine
         <ArrowRight className="w-4 h-4" />
       </div>
     </Link>

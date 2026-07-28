@@ -377,7 +377,7 @@ STAGE 5 — SYNTHESIS: Connect dots with India-first analytical lens
 Return ONLY this exact JSON, nothing else:
 {
   "query": "",
-  "intent_type": "Market Research|Competitor Intel|Financial Analysis|Growth Strategy|Industry Trends|Business Validation|Regulatory|General Research",
+  "intent_type": "Market Research|Marketing Planning|Financial Analysis|Growth Strategy|Industry Trends|Business Validation|Regulatory|General Research",
   "india_relevance": "High|Medium|Low",
   "sub_questions": ["3-5 sub-questions this research answers"],
   "key_findings": ["7-10 specific India-first findings with data points and INR values"],

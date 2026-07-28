@@ -84,9 +84,9 @@ export default function QuickReplies({ sessions, onPick }: QuickRepliesProps) {
     push('Help me prepare for the next conversation from my saved leads.')
   }
 
-  const lastCompetitor = sessions.find((s) => s.module === 'competitor')
-  if (lastCompetitor) {
-    push('Where should I compete based on my last Competitor map?')
+  const lastMarketing = sessions.find((s) => s.module === 'marketing')
+  if (lastMarketing) {
+    push('Based on my Marketing Engine work, what should I test next week?')
   }
 
   const lastIdeas = sessions.find((s) => s.module === 'ideas')

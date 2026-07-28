@@ -1,6 +1,6 @@
 export interface DashboardSession {
   id: string
-  module: 'validator' | 'competitor' | 'ideas' | 'leads' | 'chat' | 'report' | string
+  module: 'validator' | 'marketing' | 'ideas' | 'leads' | 'chat' | 'report' | string
   session_title: string | null
   verdict: string | null
   score: number | null
@@ -17,7 +17,7 @@ export interface DashboardInput { profile: DashboardFounderProfile | null; sessi
 
 export type GreetingTone = 'fresh' | 'returning' | 'active' | 'veteran'
 type Phase = 'onboarding' | 'idea' | 'research' | 'sales' | 'scaling'
-export type ToolIconKey = 'validator' | 'competitor' | 'ideas' | 'leads' | 'reports' | 'chat'
+export type ToolIconKey = 'validator' | 'marketing' | 'ideas' | 'leads' | 'reports' | 'chat'
 export interface ToolCard { id: string; label: string; outcome: string; href: string; accent: 'accent' | 'insight' | 'pivot' | 'violet' | 'fg'; iconKey: ToolIconKey; lastUsed: string | null; lastResult: string | null }
 export interface DashboardSummary {
   firstName: string; greeting: string; tone: GreetingTone
@@ -29,7 +29,7 @@ export interface DashboardSummary {
   tools: ToolCard[]; activity: DashboardActivity[]
 }
 
-const labels: Record<ToolIconKey, string> = { validator: 'Business Validator', competitor: 'Competitor Intel', ideas: 'Ideas Desk', leads: 'Leads Finder', reports: 'Business Reports', chat: 'Co-founder Desk' }
+const labels: Record<ToolIconKey, string> = { validator: 'Business Validator', marketing: 'Marketing Engine', ideas: 'Ideas Desk', leads: 'Leads Finder', reports: 'Business Reports', chat: 'Co-founder Desk' }
 export function timeAgoShort(iso: string) { const minutes = Math.max(0, Math.floor((Date.now() - new Date(iso).getTime()) / 60000)); if (minutes < 1) return 'just now'; if (minutes < 60) return `${minutes}m ago`; if (minutes < 1440) return `${Math.floor(minutes / 60)}h ago`; return `${Math.floor(minutes / 1440)}d ago` }
 export function toneClass(tone: 'go' | 'pivot' | 'kill' | 'none') { return tone === 'go' ? 'text-signal-go' : tone === 'pivot' ? 'text-signal-pivot' : tone === 'kill' ? 'text-signal-rose' : 'text-fg-muted' }
 export function toneBgClass(tone: 'go' | 'pivot' | 'kill' | 'none') { return tone === 'go' ? 'bg-signal-go/15 text-signal-go border-signal-go/30' : tone === 'pivot' ? 'bg-signal-pivot/15 text-signal-pivot border-signal-pivot/30' : tone === 'kill' ? 'bg-signal-rose/15 text-signal-rose border-signal-rose/30' : 'bg-bg-card text-fg-muted border-line' }
@@ -37,7 +37,7 @@ export function toneBgClass(tone: 'go' | 'pivot' | 'kill' | 'none') { return ton
 function phaseAction(phase: Phase) {
   if (phase === 'onboarding') return { label: 'Finish setup', href: '/onboarding', helper: 'Tell Thinkior who you are building for.' }
   if (phase === 'idea') return { label: 'Run Business Validator', href: '/validator', helper: 'Test the riskiest assumption before building.' }
-  if (phase === 'research') return { label: 'Map competitors', href: '/competitor', helper: 'See the field and identify what to verify.' }
+  if (phase === 'research') return { label: 'Create marketing roadmap', href: '/marketing', helper: 'Turn your business context into a practical social plan.' }
   if (phase === 'sales') return { label: 'Find leads', href: '/leads', helper: 'Find source-backed people worth talking to.' }
   return { label: 'Open Founder Workspace', href: '/workspace', helper: 'Review learning and choose the next test.' }
 }
@@ -45,7 +45,7 @@ function phaseAction(phase: Phase) {
 function phaseTool(phase: Phase) {
   if (phase === 'onboarding') return { label: 'Founder Workspace', href: '/workspace', reason: 'Set the context that makes each recommendation useful.' }
   if (phase === 'idea') return { label: 'Business Validator', href: '/validator', reason: 'Clarify the customer problem and riskiest assumption.' }
-  if (phase === 'research') return { label: 'Competitor Intel', href: '/competitor', reason: 'Collect evidence about alternatives and the market.' }
+  if (phase === 'research') return { label: 'Marketing Engine', href: '/marketing', reason: 'Build your first focused social-media roadmap.' }
   if (phase === 'sales') return { label: 'Leads Finder', href: '/leads', reason: 'Turn your research into customer or investor conversations.' }
   return { label: 'Co-founder Desk', href: '/chat', reason: 'Use the context you have built to decide what is next.' }
 }
@@ -53,16 +53,16 @@ function phaseTool(phase: Phase) {
 export function buildDashboardSummary(input: DashboardInput): DashboardSummary {
   const hasOnboarding = !!input.profile?.onboarding_completed
   const hasValidator = input.sessions.some((s) => s.module === 'validator')
-  const hasCompetitor = input.sessions.some((s) => s.module === 'competitor')
+  const hasMarketing = input.sessions.some((s) => s.module === 'marketing')
   const hasLeads = input.sessions.some((s) => s.module === 'leads')
   const hasReport = input.reports.length > 0
-  const phase: Phase = !hasOnboarding ? 'onboarding' : !hasValidator ? 'idea' : !hasCompetitor ? 'research' : !hasLeads ? 'sales' : 'scaling'
-  const stepsDone = [hasOnboarding, hasValidator, hasCompetitor, hasLeads, hasReport].filter(Boolean).length
+  const phase: Phase = !hasOnboarding ? 'onboarding' : !hasValidator ? 'idea' : !hasMarketing ? 'research' : !hasLeads ? 'sales' : 'scaling'
+  const stepsDone = [hasOnboarding, hasValidator, hasMarketing, hasLeads, hasReport].filter(Boolean).length
   const phaseLabel: Record<Phase, string> = { onboarding: 'Getting set up', idea: 'Validating the idea', research: 'Researching the field', sales: 'Finding conversations', scaling: 'Learning and growing' }
   const firstName = input.displayName.trim().split(/\s+/)[0] || 'Founder'
   const hour = new Date().getHours(); const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening'
   const tone: GreetingTone = input.sessions.length === 0 ? 'fresh' : stepsDone < 3 ? 'returning' : stepsDone < 5 ? 'active' : 'veteran'
-  const latest = input.sessions.filter((s) => ['validator', 'competitor', 'ideas', 'leads'].includes(s.module)).sort((a, b) => +new Date(b.created_at) - +new Date(a.created_at))[0] || null
+  const latest = input.sessions.filter((s) => ['validator', 'marketing', 'ideas', 'leads'].includes(s.module)).sort((a, b) => +new Date(b.created_at) - +new Date(a.created_at))[0] || null
   const latestValidator = input.sessions.filter((s) => s.module === 'validator').sort((a, b) => +new Date(b.created_at) - +new Date(a.created_at))[0] || null
   const score = latestValidator?.score_100 ?? null
   const scoreTone = score == null ? 'none' : score >= 75 ? 'go' : score >= 50 ? 'pivot' : 'kill'
@@ -71,7 +71,7 @@ export function buildDashboardSummary(input: DashboardInput): DashboardSummary {
   const days = input.userCreatedAt ? Math.max(1, Math.ceil((Date.now() - +new Date(input.userCreatedAt)) / 86400000)) : 1
   const tools = ([
     { id: 'validator', iconKey: 'validator', label: labels.validator, outcome: 'Get a clear evidence-backed verdict', href: '/validator', accent: 'accent' },
-    { id: 'competitor', iconKey: 'competitor', label: labels.competitor, outcome: 'Map alternatives and market evidence', href: '/competitor', accent: 'insight' },
+    { id: 'marketing', iconKey: 'marketing', label: labels.marketing, outcome: 'Build a practical social growth roadmap', href: '/marketing', accent: 'accent' },
     { id: 'ideas', iconKey: 'ideas', label: labels.ideas, outcome: 'Turn a vague idea into validation steps', href: '/ideas', accent: 'pivot' },
     { id: 'leads', iconKey: 'leads', label: labels.leads, outcome: 'Find source-backed people worth talking to', href: '/leads', accent: 'accent' },
     { id: 'reports', iconKey: 'reports', label: labels.reports, outcome: 'Turn evidence into a practical brief', href: '/reports', accent: 'accent' },

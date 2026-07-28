@@ -18,7 +18,7 @@ import { timeAgo } from '@/lib/utils/format'
 import { FEATURE_NAMES } from '@/lib/constants'
 import {
   CheckCircle2,
-  Search,
+  Megaphone,
   Lightbulb,
   Target,
   FileText,
@@ -33,7 +33,7 @@ import type { ActivityLog } from '@/types'
 
 const ICON: Record<string, typeof CheckCircle2> = {
   validator: CheckCircle2,
-  competitor: Search,
+  marketing: Megaphone,
   ideas: Lightbulb,
   leads: Target,
   report: FileText,
@@ -42,7 +42,7 @@ const ICON: Record<string, typeof CheckCircle2> = {
 
 const ACCENT: Record<string, string> = {
   validator: 'text-accent',
-  competitor: 'text-signal-insight',
+  marketing: 'text-accent',
   ideas: 'text-signal-pivot',
   leads: 'text-accent',
   report: 'text-accent',

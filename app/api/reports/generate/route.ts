@@ -35,7 +35,6 @@ function cleanInput(raw: unknown): ReportInput | null {
     targetMarket: sanitizeString(r.targetMarket, 500),
     currentRevenue: sanitizeString(r.currentRevenue, 100),
     mainChallenge: sanitizeString(r.mainChallenge, 2000),
-    competitors: sanitizeString(r.competitors, 500),
     goals: sanitizeString(r.goals, 2000),
     teamSize: sanitizeString(r.teamSize, 100),
     location: sanitizeString(r.location, 200),

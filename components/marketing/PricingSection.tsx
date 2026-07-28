@@ -25,7 +25,7 @@ const PLANS: Array<{
     description: 'For founders sketching the first idea',
     features: [
       { text: '1 Business Validation (total)' },
-      { text: 'Competitor Research — Builder & above', locked: true },
+      { text: 'Marketing Engine Starter Pack: 3 content packs' },
       { text: '1 Ideas session (total)' },
       { text: '1 Lead Finder preview (total)' },
       { text: '5 AI Chat messages (total)' },
@@ -43,7 +43,7 @@ const PLANS: Array<{
     description: 'For founders actively building',
     features: [
       { text: '5 Business Validations / day' },
-      { text: '5 Competitor Research / day' },
+      { text: 'Marketing Engine: 5 content packs / day' },
       { text: '5 Ideas sessions / day' },
       { text: '5 Lead Finder searches / day' },
       { text: '10 AI Chat messages / day' },
@@ -62,7 +62,7 @@ const PLANS: Array<{
     description: 'For founders who move every day',
     features: [
       { text: '10 Business Validations / day' },
-      { text: '10 Competitor Research / day' },
+      { text: 'Marketing Engine: 10 content packs / day' },
       { text: '10 Ideas sessions / day' },
       { text: '10 Lead Finder searches / day' },
       { text: '15 AI Chat messages / day' },

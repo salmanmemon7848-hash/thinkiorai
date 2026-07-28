@@ -14,7 +14,7 @@ interface FeatureGateProps {
 
 const UPGRADE_HINTS: Record<Feature, string> = {
   validator: 'Score every idea you have with India-first market research.',
-  competitor: 'Map the battlefield — Indian competitors, pricing, positioning.',
+  marketing: 'Build a practical social-media strategy, content plan, and weekly review loop.',
   ideas: 'Generate India-relevant business ideas in any sector.',
   leads: 'Find source-backed customer and investor leads worth talking to.',
   chat: 'Your always-on co-founder who knows your business.',

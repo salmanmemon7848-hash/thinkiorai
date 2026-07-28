@@ -2,9 +2,8 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 
 // ── Daily hard caps per plan ─────────────────────────────────────────────────
 // Sum of UNLOCKED per-feature limits, used as an overall guard:
-// free:    validator(1) + competitor(0) + ideas(1) + leads(1) + chat(5) + report(0) = 8
-// builder: validator(5) + competitor(5) + ideas(5) + leads(5) + chat(10) + report(0) = 30
-// founder_pro: validator(10) + competitor(10) + ideas(10) + leads(10) + chat(15) + report(3) = 58
+// Marketing Engine uses its own persisted quotas. Its AI calls are still
+// protected by the global guard, but do not count toward this legacy chat cap.
 // (gated features are blocked by route handlers before this is ever counted)
 export const GLOBAL_DAILY_CAPS: Record<string, number> = {
   free: 8,

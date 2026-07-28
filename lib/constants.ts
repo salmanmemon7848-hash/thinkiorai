@@ -3,7 +3,7 @@ import type { PlanLimits, Plan } from '@/types'
 export const PLAN_LIMITS: Record<Plan, PlanLimits> = {
   free: {
     validator: 1,    // 1 free Business Validation / day
-    competitor: 1,   // 1 free Competitor Intel run / day
+    marketing: 3,    // One lifetime Marketing Engine starter pack: 3 content packs
     ideas: 1,        // 1 free Ideas session / day
     leads: 1,        // One Lead Finder preview for the account lifetime
     chat: 5,         // 5 AI Chat messages / day
@@ -11,7 +11,7 @@ export const PLAN_LIMITS: Record<Plan, PlanLimits> = {
   },
   builder: {
     validator: 5,    // 5 Business Validations / day
-    competitor: 5,   // 5 Competitor Research / day
+    marketing: 5,    // 5 Marketing Engine content packs / day
     ideas: 5,        // 5 Ideas sessions / day
     leads: 5,        // 5 Lead Finder searches / day
     chat: 10,        // 10 AI Chat messages / day
@@ -19,7 +19,7 @@ export const PLAN_LIMITS: Record<Plan, PlanLimits> = {
   },
   founder_pro: {
     validator: 10,   // 10 Business Validations / day
-    competitor: 10,  // 10 Competitor Research / day
+    marketing: 10,   // 10 Marketing Engine content packs / day
     ideas: 10,       // 10 Ideas sessions / day
     leads: 10,       // 10 Lead Finder searches / day
     chat: 15,        // 15 AI Chat messages / day
@@ -54,7 +54,7 @@ export const PLAN_NAMES: Record<Plan, string> = {
 
 export const FEATURE_NAMES: Record<string, string> = {
   validator: 'Business Validator',
-  competitor: 'Competitor Research',
+  marketing: 'Marketing Engine',
   ideas: 'Business Ideas',
   leads: 'Leads Finder',
   chat: 'AI Chat',

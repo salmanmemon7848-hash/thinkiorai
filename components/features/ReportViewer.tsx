@@ -7,7 +7,6 @@ import {
   Zap,
   Building2,
   BarChart3,
-  Search,
   Scale,
   Megaphone,
   TrendingUp,
@@ -133,7 +132,7 @@ export default function ReportViewer({ report }: { report: AnyObj }) {
   const es = obj(safeReport.executive_summary)
   const bo = obj(safeReport.business_overview)
   const ma = obj(safeReport.market_analysis)
-  const ca = obj(safeReport.competitor_analysis)
+  const me = obj(safeReport.marketing_engine)
   const sw = obj(safeReport.swot_analysis)
   const ms = obj(safeReport.marketing_strategy)
   const gs = obj(safeReport.growth_strategy)
@@ -343,50 +342,16 @@ export default function ReportViewer({ report }: { report: AnyObj }) {
           </div>
         </Section>
 
-        {/* Competitor Analysis */}
-        <Section title="Competitor Analysis" icon={Search}>
-          <p className="text-[14px] text-fg-dim leading-relaxed mb-5">{str(ca.landscape_overview)}</p>
-          <div className="space-y-3 mb-5">
-            {arr<AnyObj>(ca.competitors).map((c, i) => (
-              <div key={i} className="card-premium rounded-lg p-4">
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="font-display font-semibold text-[14px] text-fg">
-                    {str(c.name)}
-                  </span>
-                  <Pill tone={str(c.type) === 'Direct' ? 'rose' : 'insight'}>{str(c.type)}</Pill>
-                </div>
-                <div className="grid sm:grid-cols-2 gap-3">
-                  <div>
-                    <p className="text-[11px] text-accent font-mono mb-1.5">STRENGTHS</p>
-                    <Bullets items={arr<string>(c.strengths)} dotColor="accent" />
-                  </div>
-                  <div>
-                    <p className="text-[11px] text-signal-rose font-mono mb-1.5">WEAKNESSES</p>
-                    <Bullets items={arr<string>(c.weaknesses)} dotColor="signal-rose" />
-                  </div>
-                </div>
-                {str(c.market_position) && (
-                  <p className="text-[13px] text-fg-muted mt-3 italic">{str(c.market_position)}</p>
-                )}
-              </div>
-            ))}
+        <Section title="Marketing strategy" icon={Megaphone}>
+          <div className="grid sm:grid-cols-2 gap-4 mb-4">
+            <Stat label="Positioning" value={str(me.positioning)} accent="accent" />
+            <Stat label="Audience" value={str(me.audience)} accent="signal-violet" />
           </div>
           <div className="grid sm:grid-cols-2 gap-4 mb-4">
-            <div className="card-premium rounded-lg p-5">
-              <p className="eyebrow text-accent mb-3">Our advantages</p>
-              <Bullets items={arr<string>(ca.competitive_advantages)} dotColor="accent" />
-            </div>
-            <div className="card-premium rounded-lg p-5">
-              <p className="eyebrow text-signal-pivot mb-3">Competitive risks</p>
-              <Bullets items={arr<string>(ca.competitive_risks)} dotColor="signal-pivot" />
-            </div>
+            <div className="card-premium rounded-lg p-5"><p className="eyebrow text-accent mb-3">Content pillars</p><Bullets items={arr<string>(me.content_pillars)} /></div>
+            <div className="card-premium rounded-lg p-5"><p className="eyebrow text-signal-violet mb-3">Launch experiments</p>{arr<AnyObj>(me.launch_experiments).map((item, i) => <p key={i} className="text-[13px] text-fg-dim leading-relaxed mb-2">{str(item.experiment)} — <span className="text-fg">{str(item.success_metric)}</span></p>)}</div>
           </div>
-          {str(ca.market_gap) && (
-            <div className="card-premium rounded-lg p-5 border-accent/30 bg-accent/[0.04]">
-              <p className="eyebrow text-accent mb-2">Market gap we fill</p>
-              <p className="text-[14px] text-fg leading-relaxed">{str(ca.market_gap)}</p>
-            </div>
-          )}
+          <div className="space-y-2">{arr<AnyObj>(me.platform_roles).map((item, i) => <div key={i} className="rounded-lg border border-line p-3"><p className="text-sm font-medium text-fg">{str(item.platform)} · {str(item.role)}</p><p className="text-xs text-fg-muted mt-1">{arr<string>(item.content_formats).join(' · ')}</p></div>)}</div>
         </Section>
 
         {/* SWOT */}

@@ -20,7 +20,7 @@ import {
   FileText,
   Map,
   Rocket,
-  Search,
+  Megaphone,
   Presentation,
   type LucideIcon,
 } from 'lucide-react'
@@ -285,12 +285,12 @@ export const REPORT_TEMPLATES: ReportTemplate[] = [
     ],
   },
   {
-    id: 'competitor',
-    name: 'Competitor Intel Report',
-    tagline: 'Who is winning, and where is the gap?',
-    question: 'How do I position against existing players?',
-    reportType: 'Competitor Analysis Report',
-    icon: Search,
+    id: 'marketing_strategy',
+    name: 'Marketing Strategy Report',
+    tagline: 'Who should you reach and what should you publish?',
+    question: 'How do I build a focused social-media plan?',
+    reportType: 'Marketing Strategy Report',
+    icon: Megaphone,
     tone: 'insight',
     steps: [
       {
@@ -337,13 +337,13 @@ export const REPORT_TEMPLATES: ReportTemplate[] = [
         placeholder: 'e.g. CA firms in Tier-2 cities, 5-20 clients, currently using Excel.',
       },
       {
-        key: 'competitors',
-        title: 'Competitors you know about',
-        subtitle: 'Comma separated. AI will discover the rest',
+        key: 'currentChannels',
+        title: 'Current marketing channels',
+        subtitle: 'What are you already using, if anything?',
         required: false,
         visible: true,
         render: 'text',
-        placeholder: 'e.g. ClearTax, Zoho Books, Razorpay',
+        placeholder: 'e.g. Instagram, LinkedIn, founder referrals',
       },
       {
         key: 'uniqueAdvantage',

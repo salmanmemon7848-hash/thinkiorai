@@ -24,6 +24,7 @@ import {
   AlertTriangle,
   Lightbulb,
   Target,
+  Megaphone,
   Compass,
   Rocket,
   Calendar,
@@ -121,7 +122,7 @@ function LatestResult({
 
   const moduleLabel: Record<string, string> = {
     validator: 'Validator',
-    competitor: 'Competitor',
+    marketing: 'Marketing Engine',
     leads: 'Leads Finder',
     ideas: 'Ideas',
     report: 'Report',
@@ -129,7 +130,7 @@ function LatestResult({
   const Icon = (() => {
     if (latest.module === 'validator') return tone === 'kill' ? AlertTriangle : tone === 'pivot' ? RotateCw : CheckCircle2
     if (latest.module === 'leads') return Target
-    if (latest.module === 'competitor') return Target
+    if (latest.module === 'marketing') return Megaphone
     if (latest.module === 'ideas') return Lightbulb
     return Sparkles
   })()
